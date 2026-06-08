@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="zh-Hant" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZERA | Premium Pet Lifestyle</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Noto+Serif+TC:wght@300;400;600&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        zera: {
+                            black: '#0A0A09',    
+                            tan: '#4A3728',      
+                            charcoal: '#1A1714', 
+                            cream: '#E5DFD9'     
+                        }
+                    },
+                    fontFamily: {
+                        serif: ['Cinzel', 'serif'],
+                        sans: ['Noto Serif TC', 'serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-zera-cream text-zera-black font-sans tracking-wide relative">
+
+    <nav class="sticky top-0 z-50 bg-zera-black text-zera-cream border-b border-zera-tan/30">
+        <div class="max-w-7xl mx-auto px-4 sm:px-8 h-20 flex items-center justify-between">
+            <div class="flex items-center gap-6">
+                <button onclick="toggleMobileMenu()" class="md:hidden p-2 focus:outline-none">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                </button>
+                <div class="flex items-center gap-4">
+                    <img src="https://pub-30ed009176fe4786a7b9646420668657.r2.dev/PicList2026/06/adcf35f35dd57f83967de6db35dc279e.webp" alt="ZERA Logo" class="h-14 w-14 sm:h-16 sm:w-16 rounded-full object-cover drop-shadow-sm">
+                    <h1 class="font-serif text-xl tracking-widest hidden sm:block">ZERA</h1>
+                </div>
+            </div>
+            
+            <div class="hidden md:flex items-center gap-4">
+                <a href="https://example.com/member-login" target="_blank" rel="noopener noreferrer" class="text-sm border border-zera-tan/50 px-5 py-2 rounded-full hover:bg-zera-tan transition">會員中心</a>
+                <button class="p-2 border border-zera-tan/50 rounded-full hover:bg-zera-tan transition">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+                </button>
+            </div>
+        </div>
+        <div class="hidden md:flex justify-center gap-12 py-3 bg-zera-charcoal text-xs uppercase tracking-widest border-t border-zera-tan/20 text-zera-cream/80">
+            <a href="#brand-story" class="hover:text-zera-tan transition">品牌美學</a>
+            <a href="#latest-news" class="hover:text-zera-tan transition">最新消息</a>
+            <a href="#product-display" class="hover:text-zera-tan transition">探索系列</a>
+            <a href="#bespoke-service" class="hover:text-zera-tan transition">尊榮訂製</a>
+            <a href="#contact-us" class="hover:text-zera-tan transition">聯絡我們</a>
+        </div>
+    </nav>
+
+    <div id="mobile-menu" class="hidden md:hidden bg-zera-black text-zera-cream p-4 space-y-4 shadow-lg absolute w-full z-40 border-b border-zera-tan/30">
+        <a href="#brand-story" onclick="toggleMobileMenu()" class="block w-full text-left py-2 border-b border-zera-tan/20">品牌美學</a>
+        <a href="#latest-news" onclick="toggleMobileMenu()" class="block w-full text-left py-2 border-b border-zera-tan/20">最新消息</a>
+        <a href="#product-display" onclick="toggleMobileMenu()" class="block w-full text-left py-2 border-b border-zera-tan/20">探索系列</a>
+        <a href="#bespoke-service" onclick="toggleMobileMenu()" class="block w-full text-left py-2 border-b border-zera-tan/20">尊榮訂製</a>
+        <a href="#contact-us" onclick="toggleMobileMenu()" class="block w-full text-left py-2 border-b border-zera-tan/20">聯絡我們</a>
+        <a href="https://example.com/member-login" target="_blank" rel="noopener noreferrer" class="block w-full text-center py-2 bg-zera-tan rounded-full mt-4">會員中心</a>
+    </div>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-8 py-12">
+        <section id="brand-story" class="mb-20 grid md:grid-cols-2 gap-12 items-center scroll-mt-24">
+            <div class="space-y-6">
+                <h2 class="font-serif text-4xl sm:text-5xl leading-tight">為您的高貴夥伴<br><span class="text-zera-tan">打造極致生活</span></h2>
+                <p class="text-zera-black/70 text-lg italic">ZERA 融匯杜賓之堅毅與邊牧之靈動，以極致美學，為您的摯愛寫下溫潤生活的篇章。</p>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div class="h-48 sm:h-64 rounded-2xl overflow-hidden bg-zera-tan"><img src="https://images.unsplash.com/photo-1590766947636-d74f3513a96a?w=600" class="w-full h-full object-cover opacity-90" alt="Pet Lifestyle 1"></div>
+                <div class="h-48 sm:h-64 rounded-2xl overflow-hidden bg-zera-tan mt-8"><img src="https://images.unsplash.com/photo-1594998893707-1678253102c7?w=600" class="w-full h-full object-cover opacity-90" alt="Pet Lifestyle 2"></div>
+            </div>
+        </section>
+
+        <section id="latest-news" class="mb-20 border-t border-zera-tan/20 pt-12 scroll-mt-24">
+            <h3 class="font-serif text-2xl tracking-widest text-center mb-8">LATEST NEWS / 最新消息</h3>
+            <div class="grid md:grid-cols-3 gap-6">
+                <div class="bg-white p-6 rounded-2xl border border-zera-tan/10 shadow-sm">
+                    <span class="text-xs text-zera-tan font-serif tracking-wider block mb-2">2026.06.01</span>
+                    <h4 class="font-bold text-sm mb-2">夏季機能外出系列全新上市</h4>
+                    <p class="text-xs text-zera-black/60 leading-relaxed">專為酷暑設計的透氣降溫胸背帶，引進歐盟認證環境友善材質，現已開放預購。</p>
+                </div>
+                <div class="bg-white p-6 rounded-2xl border border-zera-tan/10 shadow-sm">
+                    <span class="text-xs text-zera-tan font-serif tracking-wider block mb-2">2026.05.15</span>
+                    <h4 class="font-bold text-sm mb-2">尊榮會籍權益全面升級公告</h4>
+                    <p class="text-xs text-zera-black/60 leading-relaxed">即日起，黑卡會員將享有專屬一對一營養顧問諮詢與年度訂製禮遇。</p>
+                </div>
+                <div class="bg-white p-6 rounded-2xl border border-zera-tan/10 shadow-sm">
+                    <span class="text-xs text-zera-tan font-serif tracking-wider block mb-2">2026.04.20</span>
+                    <h4 class="font-bold text-sm mb-2">ZERA 品牌美學旗艦店進駐計畫</h4>
+                    <p class="text-xs text-zera-black/60 leading-relaxed">首間線下概念空間即將於台北大安區揭幕，融合極簡工業風與毛孩互動美學。</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="product-display" class="py-10 border-t border-zera-tan/20 scroll-mt-24">
+            <h2 class="font-serif text-2xl sm:text-3xl mb-8 text-zera-black tracking-widest uppercase text-center">探索精品系列</h2>
+
+            <div id="category-buttons-container" class="flex flex-wrap justify-center gap-2 sm:gap-3 mb-8"></div>
+
+            <div class="flex flex-col sm:flex-row justify-between items-center gap-4 mb-8 bg-white p-4 rounded-2xl border border-zera-tan/20 shadow-sm">
+                <div class="w-full sm:w-1/2 relative">
+                    <svg class="w-5 h-5 absolute left-3 top-2.5 text-zera-black/40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    <input type="text" id="searchInput" placeholder="搜尋當前分類產品名稱或描述..." oninput="handleSearch(event)" class="w-full bg-zera-cream/30 border border-zera-tan/30 text-zera-black rounded-full pl-10 pr-4 py-2 text-sm focus:outline-none focus:border-zera-tan transition">
+                </div>
+                <div class="w-full sm:w-auto">
+                    <select id="sortSelect" onchange="handleSort(event)" class="w-full sm:w-auto bg-zera-cream/30 border border-zera-tan/30 text-zera-black rounded-full px-4 py-2 text-sm focus:outline-none focus:border-zera-tan transition cursor-pointer appearance-none">
+                        <option value="default">預設順序</option>
+                        <option value="price-desc">價格：由高至低</option>
+                        <option value="price-asc">價格：由低至高</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8"></div>
+        </section>
+
+        <section id="bespoke-service" class="mb-20 border-t border-zera-tan/20 pt-12 scroll-mt-24 text-center max-w-2xl mx-auto space-y-6">
+            <h3 class="font-serif text-2xl tracking-widest">BESPOKE / 尊榮訂製服務</h3>
+            <p class="text-sm text-zera-black/70 leading-relaxed italic">
+                「量身打造，方能契合高貴靈魂。」<br>
+                ZERA 提供頂級實木家具與皮革外出裝備的手工訂製服務。依照毛孩體型與您的家居風格，由資深工匠耗時打造，淬鍊獨一無二的專屬物件。
+            </p>
+            <div>
+                <a href="https://example.com/bespoke" target="_blank" class="inline-block font-serif text-xs tracking-widest border border-zera-tan bg-zera-tan text-zera-cream px-8 py-3 rounded-full hover:bg-transparent hover:text-zera-tan transition">預約工匠諮詢</a>
+            </div>
+        </section>
+    </main>
+
+    <footer id="contact-us" class="bg-zera-tan text-zera-cream py-16 sm:py-24 scroll-mt-24">
+        <div class="max-w-4xl mx-auto px-8 grid md:grid-cols-2 gap-12 sm:gap-16">
+            <div class="space-y-6">
+                <h3 class="font-serif text-2xl sm:text-3xl">關於 ZERA</h3>
+                <p class="leading-relaxed text-sm opacity-90 italic">
+                    ZERA 之名，源於杜賓 Zeus 與邊牧 Vira 的靈魂共鳴。我們創立之初衷，乃是渴望將精緻細膩的照護哲學，化作平實優雅的可能，讓摯愛伴侶在每一刻陪伴中，皆能享有頂級生活之品質與尊榮。
+                </p>
+            </div>
+            <div class="space-y-4">
+                <h3 class="font-serif text-2xl sm:text-3xl">聯絡我們</h3>
+                <div class="text-sm space-y-2 opacity-90">
+                    <p>服務時間：週一至週五 10:00 - 18:00</p>
+                    <p>官方 LINE: @ZERA_Pet</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <div id="lightbox" onclick="handleBackdropClick(event)" class="fixed inset-0 z-[100] bg-zera-black/95 hidden opacity-0 transition-opacity duration-300 backdrop-blur-sm">
+        
+        <button onclick="closeLightbox()" class="absolute top-4 right-4 sm:top-6 sm:right-6 text-zera-cream hover:text-zera-tan focus:outline-none z-[110] p-2">
+            <svg class="w-8 h-8 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
+        
+        <button onclick="changeLightboxImage(-1)" class="absolute left-2 sm:left-6 top-1/2 -translate-y-1/2 text-zera-cream/50 hover:text-zera-cream focus:outline-none z-[110] p-4 transition-colors">
+            <svg class="w-10 h-10 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+        </button>
+        <button onclick="changeLightboxImage(1)" class="absolute right-2 sm:right-6 top-1/2 -translate-y-1/2 text-zera-cream/50 hover:text-zera-cream focus:outline-none z-[110] p-4 transition-colors">
+            <svg class="w-10 h-10 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+        </button>
+
+        <div id="lightbox-touch-area" class="absolute inset-0 flex items-center justify-center z-[105] w-full h-full">
+            <img id="lightbox-img" src="" class="max-w-[90vw] max-h-[85vh] object-contain select-none shadow-2xl transition-transform duration-300" alt="Product Zoom">
+        </div>
+
+        <div id="lightbox-indicators" class="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-2 z-[110]"></div>
+    </div>
+
+    <script>
+    // 1. 清理資料庫：只保留 3 個主力產品，未上架的分類保留空陣列 []
+        const productsDB = {
+            '寵物食用': [],
+            '寵物外出': [
+                {
+                    name: '四季通用寵物防水防風機能雨衣',
+                    desc: '無懼季節挑戰，防暴雨複合布料，強化防水塗層。',
+                    price: '800~1800',
+                    images: [
+                        'https://pub-30ed009176fe4786a7b9646420668657.r2.dev/PicList2026/06/ef239306808d372a5f09cf6193cde1c9.webp',
+                        'https://pub-30ed009176fe4786a7b9646420668657.r2.dev/PicList2026/06/df4573e0432378e44b56b7c97f8c50d1.webp',
+                        'https://pub-30ed009176fe4786a7b9646420668657.r2.dev/PicList2026/06/eff5d79e3bc3af454a0ae0b622871a96.webp',
+                        'https://pub-30ed009176fe4786a7b9646420668657.r2.dev/PicList2026/06/61fc494ff03ddb737dd3209c98da2e9c.webp',
+                        'https://pub-30ed009176fe4786a7b9646420668657.r2.dev/PicList2026/06/292a5c49f578d4c99106364aa25227e1.webp',
+                        'https://pub-30ed009176fe4786a7b9646420668657.r2.dev/PicList2026/06/505d0d97cfa4773501c35e5dfbc3479b.webp'
+
+                    ]
+                },
+                {
+                    name: '防水真皮牽繩',
+                    desc: '義大利進口植鞣革，內嵌抗拉扯尼龍，防水抗汙塗層處理。',
+                    price: 1650,
+                    images: [
+                        'https://images.unsplash.com/photo-1572911961642-4f74d081f9a2?w=600&q=80',
+                        'https://images.unsplash.com/photo-1541599540903-216a46ca1dc0?w=600&q=80'
+                    ]
+                }
+            ],
+            '寵物玩耍': [],
+            '寵物清潔': [],
+            '寵物日常生活': []
+        };
+
+        // 2. 動態過濾：自動抓取內部有產品的分類
+        const availableCategories = Object.keys(productsDB).filter(cat => productsDB[cat].length > 0);
+
+        // 3. 狀態初始化：預設顯示第一個有產品的分類
+        let state = {
+            category: availableCategories.length > 0 ? availableCategories[0] : '',
+            searchQuery: '',
+            sortOrder: 'default'
+        };
+
+        let currentRenderedItems = [];
+
+        function toggleMobileMenu() {
+            document.getElementById('mobile-menu').classList.toggle('hidden');
+        }
+
+        function handleCategoryClick(category) {
+            state.category = category;
+            state.searchQuery = '';
+            state.sortOrder = 'default';
+            document.getElementById('searchInput').value = '';
+            document.getElementById('sortSelect').value = 'default';
+            
+            renderCategoryButtons();
+            renderProducts();
+        }
+
+        function handleSearch(event) {
+            state.searchQuery = event.target.value.toLowerCase().trim();
+            renderProducts();
+        }
+
+        function handleSort(event) {
+            state.sortOrder = event.target.value;
+            renderProducts();
+        }
+
+        // 4. 動態渲染按鈕：只顯示有產品的分類按鈕
+        function renderCategoryButtons() {
+            const container = document.getElementById('category-buttons-container');
+            
+            container.innerHTML = availableCategories.map(cat => {
+                const isActive = state.category === cat;
+                const activeStyle = "bg-zera-tan text-zera-cream border-zera-tan shadow-md";
+                const inactiveStyle = "bg-white text-zera-black border-zera-tan/30 hover:bg-zera-cream hover:border-zera-tan/60";
+                
+                return `
+                    <button onclick="handleCategoryClick('${cat}')" class="px-5 py-2 text-xs sm:text-sm font-medium rounded-full border transition-all duration-300 ${isActive ? activeStyle : inactiveStyle}">
+                        ${cat}
+                    </button>
+                `;
+            }).join('');
+        }
+        function renderProducts() {
+            const grid = document.getElementById('product-grid');
+            let items = [...(productsDB[state.category] || [])];
+
+            if (state.searchQuery) {
+                items = items.filter(p => 
+                    p.name.toLowerCase().includes(state.searchQuery) || 
+                    p.desc.toLowerCase().includes(state.searchQuery)
+                );
+            }
+
+            if (state.sortOrder === 'price-desc') {
+                items.sort((a, b) => b.price - a.price);
+            } else if (state.sortOrder === 'price-asc') {
+                items.sort((a, b) => a.price - b.price);
+            }
+
+            currentRenderedItems = items;
+
+            if (items.length === 0) {
+                grid.innerHTML = `<div class="col-span-1 sm:col-span-2 md:col-span-4 text-center py-12 text-zera-black/50 text-sm">沒有找到符合當前條件的精品。</div>`;
+                return;
+            }
+
+            grid.innerHTML = items.map((p, itemIndex) => {
+                const imageSlides = p.images.map((imgUrl, imgIndex) => `
+                    <img src="${imgUrl}" alt="${p.name}" loading="lazy" onclick="openLightbox(${itemIndex}, ${imgIndex})" class="flex-none w-full h-full object-cover snap-center bg-zera-cream/50 cursor-zoom-in hover:opacity-90 transition-opacity" />
+                `).join('');
+
+                return `
+                <div class="bg-white p-5 rounded-3xl border border-zera-tan/10 shadow-sm text-zera-black hover:shadow-md transition-shadow flex flex-col items-center">
+                    
+                    <div class="h-48 sm:h-56 w-full rounded-2xl mb-5 overflow-hidden relative group">
+                        <div class="flex overflow-x-auto snap-x snap-mandatory h-full w-full hide-scrollbar">
+                            ${imageSlides}
+                        </div>
+                        <div class="absolute bottom-2 left-0 w-full flex justify-center gap-1.5 pointer-events-none opacity-60">
+                            ${p.images.map(() => `<div class="w-1.5 h-1.5 rounded-full bg-zera-cream shadow-sm border border-zera-black/10"></div>`).join('')}
+                        </div>
+                    </div>
+
+                    <div class="w-full text-left">
+                        <h3 class="text-sm font-bold mb-1 line-clamp-1">${p.name}</h3>
+                        <p class="text-zera-black/60 text-[11px] mb-5 line-clamp-2 leading-relaxed">${p.desc}</p>
+                    </div>
+                    
+                    <div class="mt-auto w-full flex items-center justify-between border-t border-zera-cream pt-4">
+                        <div class="text-zera-tan font-semibold text-sm tracking-wide">NT$ ${p.price.toLocaleString()}</div>
+                        <a href="#" target="_blank" rel="noopener noreferrer" class="bg-[#C6A87C] hover:bg-[#B59567] text-white text-[11px] px-4 py-1.5 rounded-full transition-colors font-medium tracking-wider shadow-sm">立即購買</a>
+                    </div>
+                </div>
+            `}).join('');
+        }
+
+        // ================= Lightbox 邏輯區塊 =================
+        let lightboxState = {
+            images: [],
+            currentIndex: 0
+        };
+
+        function openLightbox(itemIndex, imgIndex) {
+            lightboxState.images = currentRenderedItems[itemIndex].images;
+            lightboxState.currentIndex = imgIndex;
+            updateLightboxView();
+            
+            const lb = document.getElementById('lightbox');
+            lb.classList.remove('hidden');
+            lb.classList.add('flex'); // 確保使用 flex 佈局置中
+            void lb.offsetWidth;
+            lb.classList.remove('opacity-0');
+            document.body.style.overflow = 'hidden'; 
+        }
+
+        function closeLightbox() {
+            const lb = document.getElementById('lightbox');
+            lb.classList.add('opacity-0');
+            setTimeout(() => {
+                lb.classList.add('hidden');
+                lb.classList.remove('flex');
+                document.body.style.overflow = ''; 
+            }, 300);
+        }
+
+        // 偵測點擊背景 (Event Delegation)
+        function handleBackdropClick(e) {
+            // 如果點擊的是 lightbox 容器或 touch-area 空白處（非 img 本身），則關閉
+            if (e.target.id === 'lightbox' || e.target.id === 'lightbox-touch-area') {
+                closeLightbox();
+            }
+        }
+
+        function changeLightboxImage(direction) {
+            lightboxState.currentIndex += direction;
+            if(lightboxState.currentIndex < 0) lightboxState.currentIndex = lightboxState.images.length - 1;
+            if(lightboxState.currentIndex >= lightboxState.images.length) lightboxState.currentIndex = 0;
+            updateLightboxView();
+        }
+
+        function updateLightboxView() {
+            const imgEl = document.getElementById('lightbox-img');
+            imgEl.src = lightboxState.images[lightboxState.currentIndex];
+            
+            const indicatorsContainer = document.getElementById('lightbox-indicators');
+            indicatorsContainer.innerHTML = lightboxState.images.map((_, idx) => `
+                <div class="w-2 h-2 rounded-full transition-colors duration-300 ${idx === lightboxState.currentIndex ? 'bg-zera-cream' : 'bg-zera-cream/30'}"></div>
+            `).join('');
+        }
+
+        // 觸控滑動事件
+        let touchStartX = 0;
+        let touchEndX = 0;
+        const touchArea = document.getElementById('lightbox-touch-area');
+
+        touchArea.addEventListener('touchstart', e => {
+            touchStartX = e.changedTouches[0].screenX;
+        }, { passive: true });
+
+        touchArea.addEventListener('touchend', e => {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        }, { passive: true });
+
+        function handleSwipe() {
+            const threshold = 50; 
+            if (touchEndX < touchStartX - threshold) changeLightboxImage(1); 
+            if (touchEndX > touchStartX + threshold) changeLightboxImage(-1); 
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (document.getElementById('lightbox').classList.contains('hidden')) return;
+            if (e.key === 'ArrowRight') changeLightboxImage(1);
+            if (e.key === 'ArrowLeft') changeLightboxImage(-1);
+            if (e.key === 'Escape') closeLightbox();
+        });
+
+        // 初始載入
+        renderCategoryButtons();
+        renderProducts();
+    </script>
+</body>
+</html>
