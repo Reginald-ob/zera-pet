@@ -4,8 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ZERA | Premium Pet Lifestyle</title>
+    
+    <!-- Tailwind CSS (CDN 開發版) -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Noto+Serif+TC:wght@300;400;600&display=swap" rel="stylesheet">
     <script>
         tailwind.config = {
             theme: {
@@ -26,30 +27,36 @@
             }
         }
     </script>
-    <style>
-        .hide-scrollbar::-webkit-scrollbar { display: none; }
-        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-    </style>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Noto+Serif+TC:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <!-- 獨立的 CSS 檔案 -->
+    <link rel="stylesheet" href="style.css">
 </head>
 <body class="bg-zera-cream text-zera-black font-sans tracking-wide relative">
 
+    <!-- 全域導覽列 -->
     <nav class="sticky top-0 z-50 bg-zera-black text-zera-cream border-b border-zera-tan/30">
         <div class="max-w-7xl mx-auto px-4 sm:px-8 h-20 flex items-center justify-between">
             <div class="flex items-center gap-6">
-                <button onclick="toggleMobileMenu()" class="md:hidden p-2 focus:outline-none">
+                <!-- 綁定 data-action 用於 JS 事件監聽，取代 inline onclick -->
+                <button data-action="toggle-mobile-menu" class="md:hidden p-2 focus:outline-none">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
                 </button>
-                <div class="flex items-center gap-4">
+                <div class="flex items-center gap-4 cursor-pointer" data-view-target="home-view">
                     <img src="https://pub-30ed009176fe4786a7b9646420668657.r2.dev/PicList2026/06/adcf35f35dd57f83967de6db35dc279e.webp" alt="ZERA Logo" class="h-14 w-14 sm:h-16 sm:w-16 rounded-full object-cover drop-shadow-sm">
                     <h1 class="font-serif text-xl tracking-widest hidden sm:block">ZERA</h1>
                 </div>
             </div>
             
             <div class="hidden md:flex items-center gap-4">
-                <a href="https://line.me/R/ti/p/@117erntk" target="_blank" rel="noopener noreferrer" class="text-sm border border-zera-tan/50 px-5 py-2 rounded-full hover:bg-zera-tan transition">會員中心</a>
-                <a href="https://myship.7-11.com.tw/general/detail/GM2606251708655" target="_blank" rel="noopener noreferrer" class="inline-block p-2 border border-zera-tan/50 rounded-full hover:bg-zera-tan transition">
+                <button data-view-target="member-view" class="text-sm border border-zera-tan/50 px-5 py-2 rounded-full hover:bg-zera-tan transition">會員中心</button>
+                <button data-view-target="cart-view" class="inline-block p-2 border border-zera-tan/50 rounded-full hover:bg-zera-tan transition relative">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
-                </a>
+                    <!-- 購物車數量標籤預留 -->
+                    <span id="cart-count" class="absolute -top-1 -right-1 bg-zera-tan text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center hidden">0</span>
+                </button>
             </div>
         </div>
         <div class="hidden md:flex justify-center gap-12 py-3 bg-zera-charcoal text-xs uppercase tracking-widest border-t border-zera-tan/20 text-zera-cream/80">
@@ -61,82 +68,298 @@
         </div>
     </nav>
 
+    <!-- 手機版選單 (Off-canvas 預留) -->
     <div id="mobile-menu" class="hidden md:hidden bg-zera-black text-zera-cream p-4 space-y-4 shadow-lg absolute w-full z-40 border-b border-zera-tan/30">
-        <a href="#brand-story" onclick="toggleMobileMenu()" class="block w-full text-left py-2 border-b border-zera-tan/20">品牌美學</a>
-        <a href="#latest-news" onclick="toggleMobileMenu()" class="block w-full text-left py-2 border-b border-zera-tan/20">最新消息</a>
-        <a href="#product-display" onclick="toggleMobileMenu()" class="block w-full text-left py-2 border-b border-zera-tan/20">探索系列</a>
-        <a href="#bespoke-service" onclick="toggleMobileMenu()" class="block w-full text-left py-2 border-b border-zera-tan/20">預約配送</a>
-        <a href="#contact-us" onclick="toggleMobileMenu()" class="block w-full text-left py-2 border-b border-zera-tan/20">聯絡我們</a>
-        <a href="https://example.com/member-login" target="_blank" rel="noopener noreferrer" class="block w-full text-center py-2 bg-zera-tan rounded-full mt-4">會員中心</a>
+        <a href="#brand-story" data-action="close-mobile-menu" class="block w-full text-left py-2 border-b border-zera-tan/20">品牌美學</a>
+        <a href="#latest-news" data-action="close-mobile-menu" class="block w-full text-left py-2 border-b border-zera-tan/20">最新消息</a>
+        <a href="#product-display" data-action="close-mobile-menu" class="block w-full text-left py-2 border-b border-zera-tan/20">探索系列</a>
+        <a href="#bespoke-service" data-action="close-mobile-menu" class="block w-full text-left py-2 border-b border-zera-tan/20">預約配送</a>
+        <button data-view-target="member-view" data-action="close-mobile-menu" class="block w-full text-center py-2 bg-zera-tan rounded-full mt-4">會員中心</button>
     </div>
 
+    <!-- SPA 視圖容器區塊 -->
     <main class="max-w-7xl mx-auto px-4 sm:px-8 py-12">
-        <section id="brand-story" class="mb-20 grid md:grid-cols-2 gap-12 items-center scroll-mt-24">
-            <div class="space-y-6">
-                <h2 class="font-serif text-4xl sm:text-5xl leading-tight">為您的高貴夥伴<br><span class="text-zera-tan">打造極致生活</span></h2>
-                <p class="text-zera-black/70 text-lg italic">ZERA 融匯杜賓之堅毅與邊牧之靈動，以極致美學，為您的摯愛寫下溫潤生活的篇章。</p>
-            </div>
-            <div class="grid grid-cols-2 gap-4">
-                <div class="h-48 sm:h-64 rounded-2xl overflow-hidden bg-zera-tan"><img src="https://pub-30ed009176fe4786a7b9646420668657.r2.dev/PicList2026/06/77f7cf62609ed76a6a33339c107ab693.webp" class="w-full h-full object-cover opacity-90" alt="Pet Lifestyle 1"></div>
-                <div class="h-48 sm:h-64 rounded-2xl overflow-hidden bg-zera-tan mt-8"><img src="https://pub-30ed009176fe4786a7b9646420668657.r2.dev/PicList2026/06/b6fb390c9e6c965fb4646d38de1fa393.webp" class="w-full h-full object-cover opacity-90" alt="Pet Lifestyle 2"></div>
-            </div>
-        </section>
-
-        <section id="latest-news" class="mb-20 border-t border-zera-tan/20 pt-12 scroll-mt-24">
-            <h3 class="font-serif text-2xl tracking-widest text-center mb-8">LATEST NEWS / 最新消息</h3>
-            <div class="grid md:grid-cols-3 gap-6">
-                <div class="bg-white p-6 rounded-2xl border border-zera-tan/10 shadow-sm">
-                    <span class="text-xs text-zera-tan font-serif tracking-wider block mb-2">2026.06.09</span>
-                    <h4 class="font-bold text-sm mb-2">四季通用機能外出系列全新上市</h4>
-                    <p class="text-xs text-zera-black/60 leading-relaxed">專為四季設計的防風防暴雨寵物雨衣，使用科技防水複合布料及塗層，現已開放預訂。</p>
+        
+        <!-- 視圖 1: 首頁 (預設顯示) -->
+        <div id="home-view" class="view-section block">
+            <section id="brand-story" class="mb-20 grid md:grid-cols-2 gap-12 items-center scroll-mt-24">
+                <div class="space-y-6">
+                    <h2 class="font-serif text-4xl sm:text-5xl leading-tight">為您的高貴夥伴<br><span class="text-zera-tan">打造極致生活</span></h2>
+                    <p class="text-zera-black/70 text-lg italic">ZERA 融匯杜賓之堅毅與邊牧之靈動，以極致美學，為您的摯愛寫下溫潤生活的篇章。</p>
                 </div>
-                <div class="bg-white p-6 rounded-2xl border border-zera-tan/10 shadow-sm">
-                    <span class="text-xs text-zera-tan font-serif tracking-wider block mb-2">2026.06.08</span>
-                    <h4 class="font-bold text-sm mb-2">ZERA會籍權益全面升級公告</h4>
-                    <p class="text-xs text-zera-black/60 leading-relaxed">即日起，所有會員將享有超商取貨『無條件免運』優惠。待會員系統全面上線，過去累積的消費紀錄，對應的會員福利回饋均會無損延續。</p>
+                <div class="grid grid-cols-2 gap-4">
+                    <!-- 套用 PRD 規範：aspect-square (1/1) 與 object-contain -->
+                    <div class="w-full rounded-2xl overflow-hidden bg-white border border-zera-tan/10">
+                        <img src="https://pub-30ed009176fe4786a7b9646420668657.r2.dev/PicList2026/06/77f7cf62609ed76a6a33339c107ab693.webp" class="w-full h-full aspect-square object-contain opacity-90" alt="Pet Lifestyle 1">
+                    </div>
+                    <div class="w-full rounded-2xl overflow-hidden bg-white border border-zera-tan/10 mt-8">
+                        <img src="https://pub-30ed009176fe4786a7b9646420668657.r2.dev/PicList2026/06/b6fb390c9e6c965fb4646d38de1fa393.webp" class="w-full h-full aspect-square object-contain opacity-90" alt="Pet Lifestyle 2">
+                    </div>
                 </div>
-                <div class="bg-white p-6 rounded-2xl border border-zera-tan/10 shadow-sm">
-                    <span class="text-xs text-zera-tan font-serif tracking-wider block mb-2">2026.05.20</span>
-                    <h4 class="font-bold text-sm mb-2">ZERA 品牌寵物用品預訂網站上線</h4>
-                    <p class="text-xs text-zera-black/60 leading-relaxed">結合各大品管優良工廠，產品經過多次質量實測。僅接受預訂訂單，需等待10~15日。</p>
+            </section>
+
+            <section id="latest-news" class="mb-20 border-t border-zera-tan/20 pt-12 scroll-mt-24">
+                <h3 class="font-serif text-2xl tracking-widest text-center mb-8">LATEST NEWS / 最新消息</h3>
+                <div class="grid md:grid-cols-3 gap-6">
+                    <!-- 最新消息內容維持不變 -->
+                    <div class="bg-white p-6 rounded-2xl border border-zera-tan/10 shadow-sm">
+                        <span class="text-xs text-zera-tan font-serif tracking-wider block mb-2">2026.06.09</span>
+                        <h4 class="font-bold text-sm mb-2">四季通用機能外出系列全新上市</h4>
+                        <p class="text-xs text-zera-black/60 leading-relaxed">專為四季設計的防風防暴雨寵物雨衣，使用科技防水複合布料及塗層，現已開放預訂。</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl border border-zera-tan/10 shadow-sm">
+                        <span class="text-xs text-zera-tan font-serif tracking-wider block mb-2">2026.06.08</span>
+                        <h4 class="font-bold text-sm mb-2">ZERA會籍權益全面升級公告</h4>
+                        <p class="text-xs text-zera-black/60 leading-relaxed">即日起，所有會員將享有超商取貨『無條件免運』優惠。待會員系統全面上線，過去累積的消費紀錄，對應的會員福利回饋均會無損延續。</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl border border-zera-tan/10 shadow-sm">
+                        <span class="text-xs text-zera-tan font-serif tracking-wider block mb-2">2026.05.20</span>
+                        <h4 class="font-bold text-sm mb-2">ZERA 品牌寵物用品預訂網站上線</h4>
+                        <p class="text-xs text-zera-black/60 leading-relaxed">結合各大品管優良工廠，產品經過多次質量實測。僅接受預訂訂單，需等待10~15日。</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="product-display" class="py-10 border-t border-zera-tan/20 scroll-mt-24">
+                <h2 class="font-serif text-2xl sm:text-3xl mb-8 text-zera-black tracking-widest uppercase text-center">探索精品系列</h2>
+
+                <div id="category-buttons-container" class="flex flex-wrap justify-center gap-2 sm:gap-3 mb-8">
+                    <!-- 由 main.js 動態渲染 -->
+                </div>
+
+                <div class="flex flex-col sm:flex-row justify-between items-center gap-4 mb-8 bg-white p-4 rounded-2xl border border-zera-tan/20 shadow-sm">
+                    <div class="w-full sm:w-1/2 relative">
+                        <svg class="w-5 h-5 absolute left-3 top-2.5 text-zera-black/40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                        <input type="text" id="searchInput" placeholder="搜尋當前分類產品名稱或描述..." class="w-full bg-zera-cream/30 border border-zera-tan/30 text-zera-black rounded-full pl-10 pr-4 py-2 text-sm focus:outline-none focus:border-zera-tan transition">
+                    </div>
+                    <div class="w-full sm:w-auto">
+                        <select id="sortSelect" class="w-full sm:w-auto bg-zera-cream/30 border border-zera-tan/30 text-zera-black rounded-full px-4 py-2 text-sm focus:outline-none focus:border-zera-tan transition cursor-pointer appearance-none">
+                            <option value="default">預設順序</option>
+                            <option value="price-desc">價格：由高至低</option>
+                            <option value="price-asc">價格：由低至高</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- 手機版維持2欄，電腦版維持4-5欄配置 -->
+                <div id="product-grid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6">
+                    <!-- 由 main.js 動態渲染 -->
+                </div>
+            </section>
+
+            <section id="bespoke-service" class="mb-20 border-t border-zera-tan/20 pt-12 scroll-mt-24 text-center max-w-2xl mx-auto space-y-6">
+                <h3 class="font-serif text-2xl tracking-widest">大型商品配送 / 預約服務</h3>
+                <p class="text-sm text-zera-black/70 leading-relaxed italic">
+                    【大型特殊商品包裹】<br>
+                    ZERA 提供之部分商品，因體積重量超出一般快遞限制，或商品性質須經由冷鏈運輸、裝釘木架加強包裝等特殊服務，請聯繫客服為您安排專屬物流，為您爭取最划算運費。
+                </p>
+                <div>
+                    <a href="https://line.me/R/ti/p/@117erntk" target="_blank" class="inline-block font-serif text-xs tracking-widest border border-zera-tan bg-zera-tan text-zera-cream px-8 py-3 rounded-full hover:bg-transparent hover:text-zera-tan transition">前往諮詢預約</a>
+                </div>
+            </section>
+        </div>
+<!-- 視圖: 登入 / 註冊 (初始隱藏) -->
+        <div id="auth-view" class="view-section hidden animate-fade-in">
+            <!-- 卡片容器 -->
+            <div class="max-w-5xl mx-auto rounded-3xl overflow-hidden shadow-xl flex flex-col md:flex-row min-h-[600px] border border-zera-tan/10">
+                
+                <!-- 左半邊：杜賓圖片與暗灰色遮罩 -->
+                <div class="relative w-full md:w-1/2 h-64 md:h-auto">
+                    <!-- 暗灰色遮罩 (opacity-60) -->
+                    <div class="absolute inset-0 bg-neutral-900/60 z-10"></div>
+                    <!-- 杜賓佔位圖 (建議後續替換為您專屬的高畫質圖檔) -->
+                    <img src="https://pub-30ed009176fe4786a7b9646420668657.r2.dev/PicList2026/06/77f7cf62609ed76a6a33339c107ab693.webp" alt="Premium Doberman" class="absolute inset-0 w-full h-full object-cover">
+                    <!-- 左側文案疊加 -->
+                    <div class="absolute inset-0 z-20 flex flex-col justify-center items-center text-white p-8 text-center opacity-90">
+                        <h3 class="font-serif text-4xl tracking-widest mb-4">ZERA</h3>
+                        <p class="font-serif text-xs tracking-widest uppercase">Premium Pet Lifestyle</p>
+                        <div class="w-10 h-[1px] bg-white/50 mt-6"></div>
+                    </div>
+                </div>
+
+                <!-- 右半邊：登入與註冊表單 -->
+                <!-- 背景色套用您指定的 #AE8F00，文字為白色 -->
+                <div class="w-full md:w-1/2 p-10 md:p-16 flex flex-col justify-center bg-[#3E2723] text-white">
+                    <div class="max-w-sm w-full mx-auto">
+                        <h2 id="auth-title" class="font-serif text-3xl tracking-widest mb-2 uppercase">Member Login</h2>
+                        <p id="auth-subtitle" class="text-xs opacity-80 mb-10 tracking-wider">歡迎回到 ZERA，請登入您的專屬帳戶</p>
+
+                        <form id="auth-form" class="space-y-6">
+                            <!-- Input 採用底線樣式，符合高級感 -->
+                            <div>
+                                <label class="block text-[10px] tracking-widest mb-1 font-serif uppercase opacity-80">Email</label>
+                                <input type="email" required class="w-full bg-transparent border-b border-white/40 px-0 py-2 text-white placeholder-white/30 focus:outline-none focus:border-white transition-colors text-sm" placeholder="請輸入電子郵件">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] tracking-widest mb-1 font-serif uppercase opacity-80">Password</label>
+                                <input type="password" required class="w-full bg-transparent border-b border-white/40 px-0 py-2 text-white placeholder-white/30 focus:outline-none focus:border-white transition-colors text-sm" placeholder="請輸入密碼">
+                            </div>
+                            
+                            <div id="forgot-password-wrap" class="flex justify-end pt-1">
+                                <a href="#" class="text-[10px] opacity-70 hover:opacity-100 transition-opacity tracking-widest">忘記密碼？</a>
+                            </div>
+
+                            <!-- 提交按鈕：背景色 #AE8F00 (與父容器同色)，加上白框線與 Hover 反轉效果 -->
+                            <button type="submit" id="auth-submit-btn" class="w-full mt-4 border border-white bg-[#795548] text-white hover:bg-white hover:text-[#AE8F00] font-serif tracking-widest py-3.5 rounded-full transition-all duration-300 text-xs uppercase relative overflow-hidden">
+                                Sign In
+                            </button>
+                        </form>
+
+                        <!-- 切換登入與註冊狀態 -->
+                        <div class="mt-10 text-center text-xs tracking-widest">
+                            <span id="auth-toggle-text" class="opacity-70">還沒有帳號嗎？</span>
+                            <button data-action="toggle-auth-mode" class="ml-2 font-bold hover:opacity-70 transition-opacity border-b border-white/50 pb-0.5">
+                                立即註冊
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </section>
+        </div>
+<!-- 視圖: 會員中心 (初始隱藏) -->
+        <div id="member-view" class="view-section hidden animate-fade-in">
+            
+            <!-- 頁面標題 -->
+            <div class="text-center mb-12">
+                <h2 class="font-serif text-3xl tracking-widest text-zera-black uppercase">Member Center</h2>
+                <p class="text-zera-tan font-serif tracking-widest text-sm mt-2">尊榮會員中心</p>
+            </div>
 
-        <section id="product-display" class="py-10 border-t border-zera-tan/20 scroll-mt-24">
-            <h2 class="font-serif text-2xl sm:text-3xl mb-8 text-zera-black tracking-widest uppercase text-center">探索精品系列</h2>
-
-            <div id="category-buttons-container" class="flex flex-wrap justify-center gap-2 sm:gap-3 mb-8"></div>
-
-            <div class="flex flex-col sm:flex-row justify-between items-center gap-4 mb-8 bg-white p-4 rounded-2xl border border-zera-tan/20 shadow-sm">
-                <div class="w-full sm:w-1/2 relative">
-                    <svg class="w-5 h-5 absolute left-3 top-2.5 text-zera-black/40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                    <input type="text" id="searchInput" placeholder="搜尋當前分類產品名稱或描述..." oninput="handleSearch(event)" class="w-full bg-zera-cream/30 border border-zera-tan/30 text-zera-black rounded-full pl-10 pr-4 py-2 text-sm focus:outline-none focus:border-zera-tan transition">
+            <!-- 會員資訊總覽 (Dashboard Card) -->
+            <div class="bg-white rounded-3xl p-8 md:p-10 border border-zera-tan/20 shadow-sm flex flex-col md:flex-row items-center justify-between gap-8 mb-12">
+                <div class="flex items-center gap-6 w-full md:w-auto">
+                    <!-- 會員頭像預設圖 -->
+                    <div class="w-20 h-20 rounded-full bg-zera-cream flex items-center justify-center border border-zera-tan/30 flex-shrink-0">
+                        <svg class="w-8 h-8 text-zera-tan/50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                    </div>
+                    <div>
+                        <h3 class="font-serif text-2xl text-zera-black mb-1">
+                            <span id="member-name-display">林貴賓</span> <span class="text-sm font-sans text-zera-black/60 font-normal">先生</span>
+                        </h3>
+                        <div class="flex items-center gap-3 mt-2">
+                            <span class="bg-zera-black text-zera-cream text-xs px-3 py-1 rounded-full tracking-widest font-serif">BLACK TIER</span>
+                            <span class="text-xs text-zera-black/60 font-serif">黑卡會員</span>
+                        </div>
+                    </div>
                 </div>
-                <div class="w-full sm:w-auto">
-                    <select id="sortSelect" onchange="handleSort(event)" class="w-full sm:w-auto bg-zera-cream/30 border border-zera-tan/30 text-zera-black rounded-full px-4 py-2 text-sm focus:outline-none focus:border-zera-tan transition cursor-pointer appearance-none">
-                        <option value="default">預設順序</option>
-                        <option value="price-desc">價格：由高至低</option>
-                        <option value="price-asc">價格：由低至高</option>
-                    </select>
+
+                <!-- 點數與權益區塊 -->
+                <div class="flex gap-8 w-full md:w-auto border-t md:border-t-0 md:border-l border-zera-tan/20 pt-6 md:pt-0 md:pl-10">
+                    <div>
+                        <p class="text-xs text-zera-black/50 tracking-widest mb-1">累積消費</p>
+                        <p class="font-serif text-xl text-zera-black">NT$ 128,500</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-zera-black/50 tracking-widest mb-1">尊榮紅利</p>
+                        <p class="font-serif text-xl text-zera-tan">3,250 <span class="text-sm">pts</span></p>
+                    </div>
                 </div>
             </div>
 
-            <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8"></div>
-        </section>
+            <!-- 下半部：側邊選單與主內容 -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-10">
+                
+                <!-- 側邊選單 (Sidebar) -->
+                <div class="col-span-1">
+                    <div class="sticky top-28 bg-white p-6 rounded-2xl border border-zera-tan/10 shadow-sm">
+                        <nav class="space-y-2">
+                            <!-- 加上 active 樣式的示範 (我的訂單) -->
+                            <button data-action="switch-member-tab" data-target="tab-orders" class="w-full text-left px-4 py-3 text-sm tracking-wide bg-zera-cream/50 text-zera-tan border-l-2 border-zera-tan font-bold transition-colors">
+                                歷史訂單
+                            </button>
+                            <button data-action="switch-member-tab" data-target="tab-profile" class="w-full text-left px-4 py-3 text-sm tracking-wide text-zera-black/60 hover:text-zera-tan hover:bg-zera-cream/30 border-l-2 border-transparent transition-colors">
+                                帳戶設定
+                            </button>
+                            <button data-action="switch-member-tab" data-target="tab-benefits" class="w-full text-left px-4 py-3 text-sm tracking-wide text-zera-black/60 hover:text-zera-tan hover:bg-zera-cream/30 border-l-2 border-transparent transition-colors">
+                                會員權益
+                            </button>
+                            <div class="pt-4 mt-4 border-t border-zera-tan/10">
+                                <a href="https://line.me/R/ti/p/@117erntk" target="_blank" class="w-full flex items-center justify-between px-4 py-3 text-sm tracking-wide text-zera-black/60 hover:text-zera-tan hover:bg-zera-cream/30 transition-colors">
+                                    專屬客服聯繫
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                                </a>
+                                <button data-action="logout" class="w-full text-left px-4 py-3 text-sm tracking-wide text-red-800/70 hover:text-red-800 hover:bg-red-50 transition-colors">
+                                    登出帳號
+                                </button>
+                            </div>
+                        </nav>
+                    </div>
+                </div>
 
-        <section id="bespoke-service" class="mb-20 border-t border-zera-tan/20 pt-12 scroll-mt-24 text-center max-w-2xl mx-auto space-y-6">
-            <h3 class="font-serif text-2xl tracking-widest">大型商品配送 / 預約服務</h3>
-            <p class="text-sm text-zera-black/70 leading-relaxed italic">
-                【大型特殊商品包裹】<br>
-                ZERA 提供之部分商品，因體積重量超出一般快遞限制，或商品性質須經由冷鏈運輸、裝釘木架加強包裝等特殊服務，請聯繫LINE客服為您安排專屬物流，為您爭取最划算運費。
-            </p>
-            <div>
-                <a href="https://line.me/R/ti/p/@117erntk" target="_blank" class="inline-block font-serif text-xs tracking-widest border border-zera-tan bg-zera-tan text-zera-cream px-8 py-3 rounded-full hover:bg-transparent hover:text-zera-tan transition">前往諮詢預約</a>
+                <!-- 內容顯示區 (Content Area) -->
+                <div class="col-span-1 md:col-span-3">
+                    
+                    <!-- 標籤頁 1: 歷史訂單 (預設顯示) -->
+                    <div id="tab-orders" class="member-tab-content block">
+                        <h3 class="font-serif text-xl tracking-widest text-zera-black mb-6 border-b border-zera-tan/20 pb-4">ORDER HISTORY</h3>
+                        
+                        <div class="space-y-4">
+                            <!-- 單筆訂單卡片 1 -->
+                            <div class="bg-white rounded-2xl border border-zera-tan/10 p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 hover:shadow-md transition-shadow">
+                                <div>
+                                    <div class="flex items-center gap-3 mb-2">
+                                        <span class="font-serif text-sm font-bold tracking-wider">#ZR-20260615-01</span>
+                                        <span class="bg-zera-tan text-zera-cream text-[10px] px-2 py-0.5 rounded-sm tracking-widest">處理中</span>
+                                    </div>
+                                    <p class="text-xs text-zera-black/60 mb-1">2026.06.15 14:30 成立</p>
+                                    <p class="text-sm text-zera-black mt-2">四季通用寵物防水防風機能雨衣... 等 2 件商品</p>
+                                </div>
+                                <div class="w-full md:w-auto flex items-center justify-between md:flex-col md:items-end gap-2 border-t md:border-t-0 border-zera-cream pt-4 md:pt-0">
+                                    <span class="font-serif text-lg">NT$ 2,760</span>
+                                    <button class="text-xs border border-zera-tan text-zera-tan hover:bg-zera-tan hover:text-zera-cream px-4 py-1.5 rounded-full transition-colors">
+                                        查看詳情
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- 單筆訂單卡片 2 -->
+                            <div class="bg-white rounded-2xl border border-zera-tan/10 p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 hover:shadow-md transition-shadow">
+                                <div>
+                                    <div class="flex items-center gap-3 mb-2">
+                                        <span class="font-serif text-sm font-bold tracking-wider text-zera-black/70">#ZR-20260520-08</span>
+                                        <span class="bg-zera-cream text-zera-black/50 text-[10px] px-2 py-0.5 rounded-sm tracking-widest">已完成</span>
+                                    </div>
+                                    <p class="text-xs text-zera-black/40 mb-1">2026.05.20 09:15 成立</p>
+                                    <p class="text-sm text-zera-black/70 mt-2">「靜電吸附」拼接式寵物地墊 等 1 件商品</p>
+                                </div>
+                                <div class="w-full md:w-auto flex items-center justify-between md:flex-col md:items-end gap-2 border-t md:border-t-0 border-zera-cream pt-4 md:pt-0">
+                                    <span class="font-serif text-lg text-zera-black/70">NT$ 800</span>
+                                    <button class="text-xs border border-zera-tan/30 text-zera-black/50 hover:border-zera-tan hover:text-zera-tan px-4 py-1.5 rounded-full transition-colors">
+                                        查看詳情
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 分頁或載入更多 -->
+                        <div class="mt-8 text-center">
+                            <button class="text-xs tracking-widest text-zera-tan border-b border-zera-tan/30 pb-1 hover:border-zera-tan transition-colors">
+                                載入更多訂單 LOAD MORE
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 標籤頁 2: 帳戶設定 (初始隱藏) -->
+                    <div id="tab-profile" class="member-tab-content hidden">
+                        <h3 class="font-serif text-xl tracking-widest text-zera-black mb-6 border-b border-zera-tan/20 pb-4">PROFILE SETTINGS</h3>
+                        <!-- 留白給後續表單實作 -->
+                        <div class="bg-white rounded-2xl border border-zera-tan/10 p-8 text-center text-zera-black/50 text-sm">
+                            會員資料修改表單預留區塊
+                        </div>
+                    </div>
+
+                </div>
             </div>
-        </section>
+        </div>
+        
+        <!-- 視圖 3: 購物車/結帳 (初始隱藏) -->
+        <div id="cart-view" class="view-section hidden">
+            <!-- 預留給後續開發購物車邏輯與 Supabase 訂單寫入 -->
+        </div>
+
     </main>
 
+    <!-- 全域頁尾 -->
     <footer id="contact-us" class="bg-zera-tan text-zera-cream py-16 sm:py-24 scroll-mt-24">
         <div class="max-w-4xl mx-auto px-8 grid md:grid-cols-2 gap-12 sm:gap-16">
             <div class="space-y-6">
@@ -156,16 +379,16 @@
         </div>
     </footer>
 
-    <div id="lightbox" onclick="handleBackdropClick(event)" class="fixed inset-0 z-[100] bg-zera-black/95 hidden opacity-0 transition-opacity duration-300 backdrop-blur-sm">
-        
-        <button onclick="closeLightbox()" class="absolute top-4 right-4 sm:top-6 sm:right-6 text-zera-cream hover:text-zera-tan focus:outline-none z-[110] p-2">
+    <!-- 全域 Lightbox (由 JS 控制顯示) -->
+    <div id="lightbox" class="fixed inset-0 z-[100] bg-zera-black/95 hidden opacity-0 transition-opacity duration-300 backdrop-blur-sm">
+        <button data-action="close-lightbox" class="absolute top-4 right-4 sm:top-6 sm:right-6 text-zera-cream hover:text-zera-tan focus:outline-none z-[110] p-2">
             <svg class="w-8 h-8 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
         </button>
         
-        <button onclick="changeLightboxImage(-1)" class="absolute left-2 sm:left-6 top-1/2 -translate-y-1/2 text-zera-cream/50 hover:text-zera-cream focus:outline-none z-[110] p-4 transition-colors">
+        <button data-action="prev-lightbox-image" class="absolute left-2 sm:left-6 top-1/2 -translate-y-1/2 text-zera-cream/50 hover:text-zera-cream focus:outline-none z-[110] p-4 transition-colors">
             <svg class="w-10 h-10 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
         </button>
-        <button onclick="changeLightboxImage(1)" class="absolute right-2 sm:right-6 top-1/2 -translate-y-1/2 text-zera-cream/50 hover:text-zera-cream focus:outline-none z-[110] p-4 transition-colors">
+        <button data-action="next-lightbox-image" class="absolute right-2 sm:right-6 top-1/2 -translate-y-1/2 text-zera-cream/50 hover:text-zera-cream focus:outline-none z-[110] p-4 transition-colors">
             <svg class="w-10 h-10 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
         </button>
 
@@ -176,249 +399,7 @@
         <div id="lightbox-indicators" class="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-2 z-[110]"></div>
     </div>
 
-    <script>
-    // 1. 清理資料庫：只保留 3 個主力產品，未上架的分類保留空陣列 []
-        const productsDB = {
-            '寵物食用': [],
-            '寵物外出': [
-                {
-                    name: '四季通用寵物防水防風機能雨衣',
-                    desc: '無懼季節挑戰，防暴雨複合布料，強化防水塗層。',
-                    price: '880~1880',
-                    images: [
-                        'https://pub-30ed009176fe4786a7b9646420668657.r2.dev/PicList2026/06/ef239306808d372a5f09cf6193cde1c9.webp',
-                        'https://pub-30ed009176fe4786a7b9646420668657.r2.dev/PicList2026/06/df4573e0432378e44b56b7c97f8c50d1.webp',
-                        'https://pub-30ed009176fe4786a7b9646420668657.r2.dev/PicList2026/06/eff5d79e3bc3af454a0ae0b622871a96.webp',
-                        'https://pub-30ed009176fe4786a7b9646420668657.r2.dev/PicList2026/06/61fc494ff03ddb737dd3209c98da2e9c.webp',
-                        'https://pub-30ed009176fe4786a7b9646420668657.r2.dev/PicList2026/06/292a5c49f578d4c99106364aa25227e1.webp',
-                        'https://pub-30ed009176fe4786a7b9646420668657.r2.dev/PicList2026/06/505d0d97cfa4773501c35e5dfbc3479b.webp'
-
-                    ]
-                },
-                {
-                    name: '中小型犬貓用，可摺疊便攜寵物推車',
-                    desc: '中小型犬貓外出專用，可摺疊、便攜不占空間。',
-                    price: '--',
-                    images: [
-                        'https://pub-30ed009176fe4786a7b9646420668657.r2.dev/PicList2026/07/e360c343d746c8f2d0e70f97f2f99651.webp',
-                        'https://pub-30ed009176fe4786a7b9646420668657.r2.dev/PicList2026/07/d0afb4a9a2952ec1af0f30eacc2d30a0.webp',
-                        'https://pub-30ed009176fe4786a7b9646420668657.r2.dev/PicList2026/07/814be7fc94160fabd77f0cc288e17310.webp',
-                        'https://pub-30ed009176fe4786a7b9646420668657.r2.dev/PicList2026/07/72088982176ee0137a000bc513a6bb1d.webp'
-
-                    ]
-                },
-
-            ],
-            '寵物玩耍': [],
-            '寵物清潔': [],
-            '寵物日常生活': [
-                {
-                    name: '「靜電吸附」拼接式寵物地墊',
-                    desc: '多種尺寸顏色可選，靜電吸附不留膠，底部隔水設計，可拆取單片清洗，可自由裁剪。',
-                    price: '800',
-                    images: [
-                        'https://pub-30ed009176fe4786a7b9646420668657.r2.dev/PicList2026/06/a7143bea95e05a005eac179ac5c215cc.webp',
-                        'https://pub-30ed009176fe4786a7b9646420668657.r2.dev/PicList2026/06/36e69c6d542fe54fa91af0070d61f9a4.webp',
-                        'https://pub-30ed009176fe4786a7b9646420668657.r2.dev/PicList2026/06/7562a7f9e2ffb5f93b7c78f6c88e595e.webp',
-                        'https://pub-30ed009176fe4786a7b9646420668657.r2.dev/PicList2026/06/def37f50ecf6decbb97b02cbc9fe98da.webp'
-
-                    ]
-                },
-
-            ]
-        };
-
-        // 2. 動態過濾：自動抓取內部有產品的分類
-        const availableCategories = Object.keys(productsDB).filter(cat => productsDB[cat].length > 0);
-
-        // 3. 狀態初始化：預設顯示第一個有產品的分類
-        let state = {
-            category: availableCategories.length > 0 ? availableCategories[0] : '',
-            searchQuery: '',
-            sortOrder: 'default'
-        };
-
-        let currentRenderedItems = [];
-
-        function toggleMobileMenu() {
-            document.getElementById('mobile-menu').classList.toggle('hidden');
-        }
-
-        function handleCategoryClick(category) {
-            state.category = category;
-            state.searchQuery = '';
-            state.sortOrder = 'default';
-            document.getElementById('searchInput').value = '';
-            document.getElementById('sortSelect').value = 'default';
-            
-            renderCategoryButtons();
-            renderProducts();
-        }
-
-        function handleSearch(event) {
-            state.searchQuery = event.target.value.toLowerCase().trim();
-            renderProducts();
-        }
-
-        function handleSort(event) {
-            state.sortOrder = event.target.value;
-            renderProducts();
-        }
-
-        // 4. 動態渲染按鈕：只顯示有產品的分類按鈕
-        function renderCategoryButtons() {
-            const container = document.getElementById('category-buttons-container');
-            
-            container.innerHTML = availableCategories.map(cat => {
-                const isActive = state.category === cat;
-                const activeStyle = "bg-zera-tan text-zera-cream border-zera-tan shadow-md";
-                const inactiveStyle = "bg-white text-zera-black border-zera-tan/30 hover:bg-zera-cream hover:border-zera-tan/60";
-                
-                return `
-                    <button onclick="handleCategoryClick('${cat}')" class="px-5 py-2 text-xs sm:text-sm font-medium rounded-full border transition-all duration-300 ${isActive ? activeStyle : inactiveStyle}">
-                        ${cat}
-                    </button>
-                `;
-            }).join('');
-        }
-        function renderProducts() {
-            const grid = document.getElementById('product-grid');
-            let items = [...(productsDB[state.category] || [])];
-
-            if (state.searchQuery) {
-                items = items.filter(p => 
-                    p.name.toLowerCase().includes(state.searchQuery) || 
-                    p.desc.toLowerCase().includes(state.searchQuery)
-                );
-            }
-
-            if (state.sortOrder === 'price-desc') {
-                items.sort((a, b) => b.price - a.price);
-            } else if (state.sortOrder === 'price-asc') {
-                items.sort((a, b) => a.price - b.price);
-            }
-
-            currentRenderedItems = items;
-
-            if (items.length === 0) {
-                grid.innerHTML = `<div class="col-span-1 sm:col-span-2 md:col-span-4 text-center py-12 text-zera-black/50 text-sm">沒有找到符合當前條件的精品。</div>`;
-                return;
-            }
-
-            grid.innerHTML = items.map((p, itemIndex) => {
-                const imageSlides = p.images.map((imgUrl, imgIndex) => `
-                    <img src="${imgUrl}" alt="${p.name}" loading="lazy" onclick="openLightbox(${itemIndex}, ${imgIndex})" class="flex-none w-full h-full object-cover snap-center bg-zera-cream/50 cursor-zoom-in hover:opacity-90 transition-opacity" />
-                `).join('');
-
-                return `
-                <div class="bg-white p-5 rounded-3xl border border-zera-tan/10 shadow-sm text-zera-black hover:shadow-md transition-shadow flex flex-col items-center">
-                    
-                    <div class="h-48 sm:h-56 w-full rounded-2xl mb-5 overflow-hidden relative group">
-                        <div class="flex overflow-x-auto snap-x snap-mandatory h-full w-full hide-scrollbar">
-                            ${imageSlides}
-                        </div>
-                        <div class="absolute bottom-2 left-0 w-full flex justify-center gap-1.5 pointer-events-none opacity-60">
-                            ${p.images.map(() => `<div class="w-1.5 h-1.5 rounded-full bg-zera-cream shadow-sm border border-zera-black/10"></div>`).join('')}
-                        </div>
-                    </div>
-
-                    <div class="w-full text-left">
-                        <h3 class="text-sm font-bold mb-1 line-clamp-1">${p.name}</h3>
-                        <p class="text-zera-black/60 text-[11px] mb-5 line-clamp-2 leading-relaxed">${p.desc}</p>
-                    </div>
-                    
-                    <div class="mt-auto w-full flex items-center justify-between border-t border-zera-cream pt-4">
-                        <div class="text-zera-tan font-semibold text-sm tracking-wide">NT$ ${p.price.toLocaleString()}</div>
-                        <a href="https://myship.7-11.com.tw/general/detail/GM2606251708655" target="_blank" rel="noopener noreferrer" class="bg-[#C6A87C] hover:bg-[#B59567] text-white text-[11px] px-4 py-1.5 rounded-full transition-colors font-medium tracking-wider shadow-sm">立即購買</a>
-                    </div>
-                </div>
-            `}).join('');
-        }
-
-        // ================= Lightbox 邏輯區塊 =================
-        let lightboxState = {
-            images: [],
-            currentIndex: 0
-        };
-
-        function openLightbox(itemIndex, imgIndex) {
-            lightboxState.images = currentRenderedItems[itemIndex].images;
-            lightboxState.currentIndex = imgIndex;
-            updateLightboxView();
-            
-            const lb = document.getElementById('lightbox');
-            lb.classList.remove('hidden');
-            lb.classList.add('flex'); // 確保使用 flex 佈局置中
-            void lb.offsetWidth;
-            lb.classList.remove('opacity-0');
-            document.body.style.overflow = 'hidden'; 
-        }
-
-        function closeLightbox() {
-            const lb = document.getElementById('lightbox');
-            lb.classList.add('opacity-0');
-            setTimeout(() => {
-                lb.classList.add('hidden');
-                lb.classList.remove('flex');
-                document.body.style.overflow = ''; 
-            }, 300);
-        }
-
-        // 偵測點擊背景 (Event Delegation)
-        function handleBackdropClick(e) {
-            // 如果點擊的是 lightbox 容器或 touch-area 空白處（非 img 本身），則關閉
-            if (e.target.id === 'lightbox' || e.target.id === 'lightbox-touch-area') {
-                closeLightbox();
-            }
-        }
-
-        function changeLightboxImage(direction) {
-            lightboxState.currentIndex += direction;
-            if(lightboxState.currentIndex < 0) lightboxState.currentIndex = lightboxState.images.length - 1;
-            if(lightboxState.currentIndex >= lightboxState.images.length) lightboxState.currentIndex = 0;
-            updateLightboxView();
-        }
-
-        function updateLightboxView() {
-            const imgEl = document.getElementById('lightbox-img');
-            imgEl.src = lightboxState.images[lightboxState.currentIndex];
-            
-            const indicatorsContainer = document.getElementById('lightbox-indicators');
-            indicatorsContainer.innerHTML = lightboxState.images.map((_, idx) => `
-                <div class="w-2 h-2 rounded-full transition-colors duration-300 ${idx === lightboxState.currentIndex ? 'bg-zera-cream' : 'bg-zera-cream/30'}"></div>
-            `).join('');
-        }
-
-        // 觸控滑動事件
-        let touchStartX = 0;
-        let touchEndX = 0;
-        const touchArea = document.getElementById('lightbox-touch-area');
-
-        touchArea.addEventListener('touchstart', e => {
-            touchStartX = e.changedTouches[0].screenX;
-        }, { passive: true });
-
-        touchArea.addEventListener('touchend', e => {
-            touchEndX = e.changedTouches[0].screenX;
-            handleSwipe();
-        }, { passive: true });
-
-        function handleSwipe() {
-            const threshold = 50; 
-            if (touchEndX < touchStartX - threshold) changeLightboxImage(1); 
-            if (touchEndX > touchStartX + threshold) changeLightboxImage(-1); 
-        }
-
-        document.addEventListener('keydown', (e) => {
-            if (document.getElementById('lightbox').classList.contains('hidden')) return;
-            if (e.key === 'ArrowRight') changeLightboxImage(1);
-            if (e.key === 'ArrowLeft') changeLightboxImage(-1);
-            if (e.key === 'Escape') closeLightbox();
-        });
-
-        // 初始載入
-        renderCategoryButtons();
-        renderProducts();
-    </script>
+    <!-- 獨立的 JS 邏輯檔案 -->
+    <script src="main.js"></script>
 </body>
 </html>
