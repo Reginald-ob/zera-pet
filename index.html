@@ -255,32 +255,90 @@
             </div>
 
             <!-- 會員資訊總覽 (Dashboard Card) -->
-            <div class="bg-white rounded-3xl p-8 md:p-10 border border-zera-tan/20 shadow-sm flex flex-col md:flex-row items-center justify-between gap-8 mb-12">
-                <div class="flex items-center gap-6 w-full md:w-auto">
-                    <!-- 會員頭像預設圖 -->
-                    <div class="w-20 h-20 rounded-full bg-zera-cream flex items-center justify-center border border-zera-tan/30 flex-shrink-0">
-                        <svg class="w-8 h-8 text-zera-tan/50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+            <div class="bg-white rounded-3xl p-5 sm:p-8 md:p-10 border border-zera-tan/20 shadow-sm flex flex-col md:flex-row items-center justify-between gap-6 md:gap-8 mb-12 relative overflow-hidden">
+                
+                <!-- 加上 w-full 確保排版佈局 -->
+                <div class="flex items-start gap-4 sm:gap-6 w-full md:w-auto">
+                    <!-- 會員頭像預設圖 (手機版微調縮小) -->
+                    <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-zera-cream flex items-center justify-center border border-zera-tan/30 shrink-0 mt-1">
+                        <svg class="w-6 h-6 sm:w-8 sm:h-8 text-zera-tan/50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
                     </div>
-                    <div>
-                        <h3 class="font-serif text-2xl text-zera-black mb-1">
-                            <span id="member-name-display">林貴賓</span> <span class="text-sm font-sans text-zera-black/60 font-normal">先生</span>
-                        </h3>
-                        <div class="flex items-center gap-3 mt-2">
-                            <span class="bg-zera-black text-zera-cream text-xs px-3 py-1 rounded-full tracking-widest font-serif">BLACK TIER</span>
-                            <span class="text-xs text-zera-black/60 font-serif">黑卡會員</span>
+                    
+                    <!-- ★ 加上 flex-1 與 min-w-0 是解決手機版超出邊界的關鍵 -->
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center justify-between md:justify-start gap-4 w-full mb-4">
+                            <h3 class="font-serif text-xl sm:text-2xl text-zera-black truncate">
+                                <span id="member-name-display">林貴賓</span> <span class="text-xs sm:text-sm font-sans text-zera-black/60 font-normal">先生</span>
+                            </h3>
+                            <!-- 登出按鈕 -->
+                            <button data-action="logout" class="text-[10px] border border-zera-tan/40 text-zera-black/60 hover:text-white hover:bg-zera-tan px-3 py-1.5 rounded-full transition-colors tracking-widest uppercase shadow-sm shrink-0">
+                                Logout
+                            </button>
                         </div>
+                        
+                        <!-- 雙軌會員進度條區塊 -->
+                        <div class="space-y-4 w-full md:w-80">
+                            <!-- 狗派進度條 -->
+                            <div id="dog-progress-wrap" class="transition-all duration-300">
+                                <div class="flex justify-between items-end mb-1.5">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-[10px] tracking-widest font-bold dog-text-title">狗派尊榮</span>
+                                        <span id="dog-tier-badge" class="bg-zera-black text-zera-cream text-[9px] px-2 py-0.5 rounded-full tracking-widest font-serif transition-colors whitespace-nowrap">狗奴才</span>
+                                    </div>
+                                    <span id="dog-progress-value" class="text-[10px] font-serif dog-text-value">0 / 10,000</span>
+                                </div>
+                                <div class="progress-track relative w-full h-1.5 bg-black/10 rounded-full overflow-hidden">
+                                    <div id="dog-progress-bar" class="absolute top-0 left-0 h-full rounded-full transition-all duration-1000 w-0"></div>
+                                    <div class="absolute top-0 left-[25%] w-[2px] h-full bg-white/40"></div>
+                                    <div class="absolute top-0 left-[50%] w-[2px] h-full bg-white/40"></div>
+                                    <div class="absolute top-0 left-[75%] w-[2px] h-full bg-white/40"></div>
+                                </div>
+                                <div class="flex justify-between text-[8.5px] mt-1.5 font-serif tracking-wider dog-text-nodes">
+                                    <span>0</span>
+                                    <span>500</span>
+                                    <span>1K</span>
+                                    <span>3K</span>
+                                    <span>10K</span>
+                                </div>
+                            </div>
+
+                            <!-- 貓派進度條 -->
+                            <div id="cat-progress-wrap" class="transition-all duration-300">
+                                <div class="flex justify-between items-end mb-1.5">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-[10px] tracking-widest font-bold cat-text-title">貓派尊榮</span>
+                                        <span id="cat-tier-badge" class="bg-zera-black text-zera-cream text-[9px] px-2 py-0.5 rounded-full tracking-widest font-serif transition-colors whitespace-nowrap">貓奴才</span>
+                                    </div>
+                                    <span id="cat-progress-value" class="text-[10px] font-serif cat-text-value">0 / 10,000</span>
+                                </div>
+                                <div class="progress-track relative w-full h-1.5 bg-black/10 rounded-full overflow-hidden">
+                                    <div id="cat-progress-bar" class="absolute top-0 left-0 h-full rounded-full transition-all duration-1000 w-0"></div>
+                                    <div class="absolute top-0 left-[25%] w-[2px] h-full bg-white/40"></div>
+                                    <div class="absolute top-0 left-[50%] w-[2px] h-full bg-white/40"></div>
+                                    <div class="absolute top-0 left-[75%] w-[2px] h-full bg-white/40"></div>
+                                </div>
+                                <div class="flex justify-between text-[8.5px] mt-1.5 font-serif tracking-wider cat-text-nodes">
+                                    <span>0</span>
+                                    <span>500</span>
+                                    <span>1K</span>
+                                    <span>3K</span>
+                                    <span>10K</span>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
 
-                <!-- 點數與權益區塊 -->
-                <div class="flex gap-8 w-full md:w-auto border-t md:border-t-0 md:border-l border-zera-tan/20 pt-6 md:pt-0 md:pl-10">
+                <!-- 點數區塊維持原樣，加入 shrink-0 防止擠壓 -->
+                <div class="flex gap-4 sm:gap-8 w-full md:w-auto border-t md:border-t-0 md:border-l border-zera-tan/20 pt-6 md:pt-0 md:pl-10 h-full items-center shrink-0">
                     <div>
-                        <p class="text-xs text-zera-black/50 tracking-widest mb-1">累積消費</p>
-                        <p class="font-serif text-xl text-zera-black">NT$ 128,500</p>
+                        <p class="text-[10px] sm:text-xs text-zera-black/50 tracking-widest mb-1">累積消費</p>
+                        <p id="member-total-spent" class="font-serif text-lg sm:text-xl text-zera-black">NT$ 0</p>
                     </div>
                     <div>
-                        <p class="text-xs text-zera-black/50 tracking-widest mb-1">尊榮紅利</p>
-                        <p class="font-serif text-xl text-zera-tan">3,250 <span class="text-sm">pts</span></p>
+                        <p class="text-[10px] sm:text-xs text-zera-black/50 tracking-widest mb-1">尊榮紅利</p>
+                        <p id="member-reward-points" class="font-serif text-lg sm:text-xl text-zera-tan">0 <span class="text-xs sm:text-sm">pts</span></p>
                     </div>
                 </div>
             </div>
