@@ -1,0 +1,445 @@
+[
+  {
+    "name": "全家板橋新翠店",
+    "id": "018350",
+    "tel": "02-22544470",
+    "lat": 25.031718,
+    "lng": 121.479298,
+    "city": "新北市",
+    "area": "板橋區",
+    "road": "懷德街",
+    "address": "新北市板橋區懷德街 127 巷 23 弄 7 號 1 樓",
+    "service": [
+      "sweat-potato",
+      "toilet",
+      "rest-area",
+      "charge-spot",
+      "recyclable-cup",
+      "hot-dog"
+    ]
+  },
+  {
+    "name": "全家環河店",
+    "id": "024099",
+    "tel": "02-23085327",
+    "lat": 25.033876,
+    "lng": 121.490723,
+    "city": "台北市",
+    "area": "萬華區",
+    "road": "環河南路二段",
+    "address": "台北市萬華區環河南路二段 250 巷 44 號 1 樓",
+    "service": [
+      "famiice",
+      "sweat-potato",
+      "two-famiice",
+      "baked-potato",
+      "recyclable-cup",
+      "hot-dog",
+      "veggie-zone"
+    ]
+  },
+  {
+    "name": "全家板橋江翠店",
+    "id": "023626",
+    "tel": "02-22525104",
+    "lat": 25.030925,
+    "lng": 121.478897,
+    "city": "新北市",
+    "area": "板橋區",
+    "road": "懷德街",
+    "address": "新北市板橋區懷德街 127 巷 1 號及 3 號 1F",
+    "service": [
+      "famiice",
+      "sweat-potato",
+      "single-famiice",
+      "rest-area",
+      "baked-potato",
+      "sohot-dessert",
+      "charge-spot",
+      "hot-dog",
+      "jpy-atm"
+    ]
+  },
+  {
+    "name": "全家板橋懷聖店",
+    "id": "025907",
+    "tel": "02-22505214",
+    "lat": 25.029215,
+    "lng": 121.480738,
+    "city": "新北市",
+    "area": "板橋區",
+    "road": "懷德街",
+    "address": "新北市板橋區懷德街 201 巷 2 號",
+    "service": [
+      "sweat-potato",
+      "rest-area",
+      "charge-spot",
+      "cook-now",
+      "hot-dog"
+    ]
+  },
+  {
+    "name": "全家板橋懷治店",
+    "id": "025884",
+    "tel": "02-82529989",
+    "lat": 25.031069,
+    "lng": 121.47834,
+    "city": "新北市",
+    "area": "板橋區",
+    "road": "民治街",
+    "address": "新北市板橋區民治街 117 號 1 樓",
+    "service": [
+      "sweat-potato",
+      "costco-shelf",
+      "charge-spot",
+      "recyclable-cup",
+      "hot-dog"
+    ]
+  },
+  {
+    "name": "全家環南店",
+    "id": "022419",
+    "tel": "02-23026891",
+    "lat": 25.031478,
+    "lng": 121.490648,
+    "city": "台北市",
+    "area": "萬華區",
+    "road": "環河南路二段",
+    "address": "台北市萬華區環河南路二段 298 號",
+    "service": [
+      "sweat-potato",
+      "rest-area",
+      "charge-spot",
+      "hot-dog"
+    ]
+  },
+  {
+    "name": "全家綠堤店",
+    "id": "025953",
+    "tel": "02-23041210",
+    "lat": 25.032933,
+    "lng": 121.492299,
+    "city": "台北市",
+    "area": "萬華區",
+    "road": "環河南路二段",
+    "address": "台北市萬華區環河南路二段 173 號",
+    "service": [
+      "famiice",
+      "sweat-potato",
+      "single-famiice",
+      "rest-area",
+      "charge-spot",
+      "steam-fresh",
+      "recyclable-cup",
+      "hot-dog",
+      "weighed-sweets"
+    ]
+  },
+  {
+    "name": "全家板橋興盛店",
+    "id": "022206",
+    "tel": "02-82589625",
+    "lat": 25.02746,
+    "lng": 121.478933,
+    "city": "新北市",
+    "area": "板橋區",
+    "road": "文聖街",
+    "address": "新北市板橋區文聖街 161 號 1 樓",
+    "service": [
+      "famiice",
+      "sweat-potato",
+      "single-famiice",
+      "rest-area",
+      "baked-potato",
+      "charge-spot",
+      "steam-fresh",
+      "recyclable-cup",
+      "cook-now",
+      "no-pork",
+      "hot-dog"
+    ]
+  },
+  {
+    "name": "全家板橋勝文店",
+    "id": "016053",
+    "tel": "02-82528693",
+    "lat": 25.031672,
+    "lng": 121.475206,
+    "city": "新北市",
+    "area": "板橋區",
+    "road": "仁化街",
+    "address": "新北市板橋區仁化街 46 號及 46 之 1 號 1 樓",
+    "service": [
+      "sweat-potato",
+      "toilet",
+      "rest-area",
+      "costco-shelf",
+      "charge-spot",
+      "recyclable-cup",
+      "hot-dog"
+    ]
+  },
+  {
+    "name": "全家板橋華利店",
+    "id": "026262",
+    "tel": "02-22541201",
+    "lat": 25.035558,
+    "lng": 121.474087,
+    "city": "新北市",
+    "area": "板橋區",
+    "road": "華江一路",
+    "address": "新北市板橋區華江一路 156 號",
+    "service": [
+      "sweat-potato",
+      "charge-spot",
+      "formosa-tea",
+      "steam-fresh",
+      "cook-now",
+      "hot-dog"
+    ]
+  },
+  {
+    "name": "全家和西店",
+    "id": "017367",
+    "tel": "02-23080749",
+    "lat": 25.035114,
+    "lng": 121.494543,
+    "city": "台北市",
+    "area": "萬華區",
+    "road": "和平西路三段",
+    "address": "台北市萬華區愛鄉里和平西路三段 290 之 5 號、 290",
+    "service": [
+      "sweat-potato",
+      "rest-area",
+      "costco-shelf",
+      "charge-spot",
+      "hot-dog",
+      "jpy-atm",
+      "weighed-sweets"
+    ]
+  },
+  {
+    "name": "全家板橋國翠店",
+    "id": "023735",
+    "tel": "02-82527477",
+    "lat": 25.031211,
+    "lng": 121.473703,
+    "city": "新北市",
+    "area": "板橋區",
+    "road": "文化路二段",
+    "address": "新北市板橋區文化路二段 396 號",
+    "service": [
+      "sweat-potato",
+      "charge-spot",
+      "hot-dog"
+    ]
+  },
+  {
+    "name": "全家板橋松柏店",
+    "id": "022490",
+    "tel": "02-82520901",
+    "lat": 25.029747,
+    "lng": 121.474202,
+    "city": "新北市",
+    "area": "板橋區",
+    "road": "松柏街",
+    "address": "新北市板橋區松柏街 13 號",
+    "service": [
+      "sweat-potato",
+      "charge-spot",
+      "hot-dog",
+      "jpy-atm"
+    ]
+  },
+  {
+    "name": "全家金園店",
+    "id": "015892",
+    "tel": "02-23083402",
+    "lat": 25.031294,
+    "lng": 121.495164,
+    "city": "台北市",
+    "area": "萬華區",
+    "road": "西園路二段",
+    "address": "臺北市萬華區西園路二段 140 巷 42 號",
+    "service": [
+      "sweat-potato",
+      "rest-area",
+      "charge-spot"
+    ]
+  },
+  {
+    "name": "全家寶元店",
+    "id": "022435",
+    "tel": "02-23099925",
+    "lat": 25.027289,
+    "lng": 121.493322,
+    "city": "台北市",
+    "area": "萬華區",
+    "road": "寶興街",
+    "address": "台北市萬華區寶興街 40 號",
+    "service": [
+      "famiice",
+      "sweat-potato",
+      "single-famiice",
+      "rest-area",
+      "charge-spot",
+      "recyclable-cup",
+      "hot-dog"
+    ]
+  },
+  {
+    "name": "全家板橋江北店",
+    "id": "022533",
+    "tel": "02-82570100",
+    "lat": 25.03346,
+    "lng": 121.471063,
+    "city": "新北市",
+    "area": "板橋區",
+    "road": "長江路二段",
+    "address": "新北市板橋區長江路二段 313 號 1 樓",
+    "service": [
+      "sweat-potato",
+      "baked-potato",
+      "charge-spot",
+      "cook-now",
+      "hot-dog"
+    ]
+  },
+  {
+    "name": "全家板橋龍江店",
+    "id": "021962",
+    "tel": "02-82535436",
+    "lat": 25.029126,
+    "lng": 121.47245,
+    "city": "新北市",
+    "area": "板橋區",
+    "road": "文化路二段",
+    "address": "新北市板橋區文化路二段 182 巷 3 弄 91、93 號 1 樓",
+    "service": [
+      "famiice",
+      "sweat-potato",
+      "single-famiice",
+      "rest-area",
+      "baked-potato",
+      "sohot-dessert",
+      "charge-spot",
+      "recyclable-cup",
+      "sohot-grill",
+      "hot-dog"
+    ]
+  },
+  {
+    "name": "全家鑫吉利店",
+    "id": "023538",
+    "tel": "02-23378557",
+    "lat": 25.026846,
+    "lng": 121.495038,
+    "city": "台北市",
+    "area": "萬華區",
+    "road": "東園街",
+    "address": "台北市萬華區東園街 28 巷 34 號",
+    "service": [
+      "sweat-potato",
+      "rest-area",
+      "baked-potato",
+      "charge-spot",
+      "steam-fresh",
+      "cook-now",
+      "hot-dog"
+    ]
+  },
+  {
+    "name": "全家板橋華江店",
+    "id": "019559",
+    "tel": "02-22554256",
+    "lat": 25.03148,
+    "lng": 121.470944,
+    "city": "新北市",
+    "area": "板橋區",
+    "road": "雙十路三段",
+    "address": "新北市板橋區雙十路三段 54 號",
+    "service": [
+      "famiice",
+      "sweat-potato",
+      "single-famiice",
+      "recyclable-cup"
+    ]
+  },
+  {
+    "name": "全家板橋立都店",
+    "id": "017459",
+    "tel": "02-22559171",
+    "lat": 25.029075,
+    "lng": 121.471268,
+    "city": "新北市",
+    "area": "板橋區",
+    "road": "文化路二段",
+    "address": "新北市板橋區文化路二段 259 號 1 樓",
+    "service": [
+      "sweat-potato",
+      "toilet",
+      "rest-area",
+      "charge-spot",
+      "smart-coffee",
+      "hot-dog"
+    ]
+  },
+  {
+    "name": "全家新廣州店",
+    "id": "022621",
+    "tel": "02-23027354",
+    "lat": 25.036837,
+    "lng": 121.498563,
+    "city": "台北市",
+    "area": "萬華區",
+    "road": "廣州街",
+    "address": "台北市萬華區廣州街 235-1 號",
+    "service": [
+      "sweat-potato",
+      "rest-area",
+      "two-famiice",
+      "sohot-dessert",
+      "charge-spot",
+      "hot-dog",
+      "jpy-atm",
+      "weighed-sweets"
+    ]
+  },
+  {
+    "name": "全家萬園店",
+    "id": "026193",
+    "tel": "02-23040410",
+    "lat": 25.035019,
+    "lng": 121.499378,
+    "city": "台北市",
+    "area": "萬華區",
+    "road": "西園路一段",
+    "address": "台北市萬華區西園路一段 159 號壹樓",
+    "service": [
+      "sweat-potato",
+      "rest-area",
+      "charge-spot",
+      "spicy-egg",
+      "recyclable-cup",
+      "hot-dog"
+    ]
+  },
+  {
+    "name": "全家板橋松翠店",
+    "id": "018966",
+    "tel": "02-22542581",
+    "lat": 25.026746,
+    "lng": 121.468683,
+    "city": "新北市",
+    "area": "板橋區",
+    "road": "松江街",
+    "address": "新北市板橋區松江街 25 號 1 樓",
+    "service": [
+      "sweat-potato",
+      "costco-shelf",
+      "charge-spot",
+      "recyclable-cup",
+      "hot-dog"
+    ]
+  }
+]

@@ -494,6 +494,80 @@
             </div>
         </div>
 
+        <!-- 視圖 4: 物流與結帳 (Checkout View) -->
+        <div id="checkout-view" class="view-section hidden animate-fade-in">
+            <div class="text-center mb-12">
+                <h2 class="font-serif text-3xl tracking-widest text-zera-black uppercase">Checkout</h2>
+                <p class="text-zera-tan font-serif tracking-widest text-sm mt-2">物流與結帳資訊</p>
+            </div>
+
+            <div class="max-w-3xl mx-auto bg-white p-8 md:p-12 rounded-3xl border border-zera-tan/20 shadow-sm">
+                <form id="checkout-form" class="space-y-8">
+                    
+                    <!-- 收件人基本資料 -->
+                    <div>
+                        <h3 class="font-serif text-lg tracking-widest mb-6 border-b border-zera-tan/10 pb-4 uppercase">Recipient Info / 收件人資訊</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-xs tracking-widest mb-2 font-serif text-zera-black/70">姓名 Name</label>
+                                <input type="text" id="ship-name" required class="w-full bg-zera-cream/20 border border-zera-tan/30 rounded-lg px-4 py-2.5 text-zera-black focus:outline-none focus:border-zera-tan transition-colors text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-xs tracking-widest mb-2 font-serif text-zera-black/70">手機 Phone</label>
+                                <input type="tel" id="ship-phone" required class="w-full bg-zera-cream/20 border border-zera-tan/30 rounded-lg px-4 py-2.5 text-zera-black focus:outline-none focus:border-zera-tan transition-colors text-sm">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 物流方式選擇 -->
+                    <div>
+                        <h3 class="font-serif text-lg tracking-widest mb-6 border-b border-zera-tan/10 pb-4 uppercase">Shipping Method / 物流方式</h3>
+                        <div>
+                            <label class="block text-xs tracking-widest mb-2 font-serif text-zera-black/70">選擇物流</label>
+                            <select id="logistics-select" required class="w-full bg-zera-cream/20 border border-zera-tan/30 rounded-lg px-4 py-2.5 text-zera-black focus:outline-none focus:border-zera-tan transition-colors text-sm cursor-pointer appearance-none">
+                                <option value="" disabled selected>請選擇物流方式</option>
+                                <option value="7-11">7-11 超商取貨</option>
+                                <option value="FamilyMart">全家 超商取貨</option>
+                                <option value="BlackCat">黑貓宅急便 (宅配)</option>
+                                <option value="HCT">新竹物流 (宅配)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- 動態物流區塊 A: 超商門市搜尋 (預設隱藏) -->
+                    <div id="cvs-search-area" class="hidden bg-zera-cream/20 p-6 rounded-xl border border-zera-tan/10 space-y-4">
+                        <label class="block text-xs tracking-widest font-serif text-zera-black/70">依地址或路名周邊查詢門市</label>
+                        <div class="flex gap-2">
+                            <input type="text" id="cvs-keyword" placeholder="例如：板橋區懷德街" class="flex-1 bg-white border border-zera-tan/30 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-zera-tan">
+                            <button type="button" id="cvs-search-btn" class="bg-zera-charcoal text-white px-6 py-2 rounded-lg text-xs tracking-widest hover:bg-zera-tan transition-colors">搜尋門市</button>
+                        </div>
+                        <!-- 搜尋結果列表 -->
+                        <div id="cvs-results-container" class="max-h-48 overflow-y-auto space-y-2 mt-4 hide-scrollbar"></div>
+                        
+                        <!-- 已選取的門市顯示 -->
+                        <div id="cvs-selected-display" class="hidden mt-4 p-4 bg-zera-tan/10 border border-zera-tan/30 rounded-lg">
+                            <p class="text-xs text-zera-tan font-bold mb-1">已選擇門市：</p>
+                            <p id="cvs-store-name" class="text-sm font-bold text-zera-black"></p>
+                            <p id="cvs-store-address" class="text-xs text-zera-black/60 mt-1"></p>
+                        </div>
+                    </div>
+
+                    <!-- 動態物流區塊 B: 宅配地址輸入 (預設隱藏) -->
+                    <div id="home-delivery-area" class="hidden space-y-4">
+                        <label class="block text-xs tracking-widest mb-2 font-serif text-zera-black/70">配送地址 Delivery Address</label>
+                        <input type="text" id="ship-address" class="w-full bg-zera-cream/20 border border-zera-tan/30 rounded-lg px-4 py-2.5 text-zera-black focus:outline-none focus:border-zera-tan transition-colors text-sm" placeholder="請輸入完整收件地址">
+                    </div>
+
+                    <!-- 最終送出按鈕 -->
+                    <div class="pt-8 border-t border-zera-tan/10 mt-8">
+                        <button type="submit" id="final-submit-btn" class="w-full border border-zera-tan bg-zera-tan text-zera-cream hover:bg-transparent hover:text-zera-tan font-serif tracking-widest py-4 rounded-full transition-all duration-300 text-sm uppercase text-center block shadow-md">
+                            確認送出訂單 Submit Order
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
     </main>
 
     <!-- 全域頁尾 -->

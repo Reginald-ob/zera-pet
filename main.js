@@ -967,6 +967,235 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // ==========================================
+    // 6. 結帳視圖切換與物流設定 (Checkout & Logistics)
+    // ==========================================
+    const checkoutBtn = document.getElementById('checkout-btn');
+    const logisticsSelect = document.getElementById('logistics-select');
+    const cvsSearchArea = document.getElementById('cvs-search-area');
+    const homeDeliveryArea = document.getElementById('home-delivery-area');
+    const shipAddressInput = document.getElementById('ship-address');
+    
+    // 儲存用戶最終選定的物流與門市資料
+    let selectedShippingMeta = null;
+
+    // A. 購物車點擊「前往結帳」：進行防呆並切換視圖
+    if (checkoutBtn) {
+        checkoutBtn.addEventListener('click', () => {
+            if (!currentUser) {
+                document.getElementById('auth-prompt-modal').classList.remove('hidden');
+                document.getElementById('auth-prompt-content').classList.remove('scale-95', 'opacity-0');
+                document.getElementById('auth-prompt-content').classList.add('scale-100', 'opacity-100');
+                return;
+            }
+            if (cartState.length === 0) {
+                alert('您的購物車目前沒有商品，請先去逛逛吧！');
+                return;
+            }
+            
+            // 跳轉至物流填寫視圖 (checkout-view)
+            document.querySelectorAll('.view-section').forEach(sec => {
+                sec.classList.remove('block');
+                sec.classList.add('hidden');
+            });
+            document.getElementById('checkout-view').classList.remove('hidden');
+            document.getElementById('checkout-view').classList.add('block');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    }
+
+    // B. 物流下拉選單切換邏輯
+    if (logisticsSelect) {
+        logisticsSelect.addEventListener('change', (e) => {
+            const method = e.target.value;
+            selectedShippingMeta = null; // 重置已選資料
+            document.getElementById('cvs-selected-display').classList.add('hidden');
+            
+            if (method === '7-11' || method === 'FamilyMart') {
+                cvsSearchArea.classList.remove('hidden');
+                homeDeliveryArea.classList.add('hidden');
+                shipAddressInput.required = false;
+            } else if (method === 'BlackCat' || method === 'HCT') {
+                cvsSearchArea.classList.add('hidden');
+                homeDeliveryArea.classList.remove('hidden');
+                shipAddressInput.required = true;
+            }
+        });
+    }
+
+    // C. 超商門市 JSON 搜尋邏輯
+    const cvsSearchBtn = document.getElementById('cvs-search-btn');
+    if (cvsSearchBtn) {
+        cvsSearchBtn.addEventListener('click', async () => {
+            const keyword = document.getElementById('cvs-keyword').value.trim();
+            const method = logisticsSelect.value;
+            if (!keyword) {
+                alert('請輸入地址或路名關鍵字');
+                return;
+            }
+
+            cvsSearchBtn.disabled = true;
+            cvsSearchBtn.textContent = '搜尋中...';
+            
+            try {
+                // 依據選擇的超商載入對應的 JSON 檔案 (請確保檔案放在專案根目錄)
+                const jsonFile = method === '7-11' ? 'cvs-list.json' : 'cvs-list(1).json';
+                const response = await fetch(jsonFile);
+                
+                if (!response.ok) throw new Error('無法讀取門市資料，請確認 JSON 檔案是否存在。');
+                const storeList = await response.json();
+
+                // 依據地址或路名過濾
+                const results = storeList.filter(store => 
+                    (store.address && store.address.includes(keyword)) || 
+                    (store.road && store.road.includes(keyword))
+                );
+
+                const container = document.getElementById('cvs-results-container');
+                if (results.length === 0) {
+                    container.innerHTML = '<p class="text-xs text-red-800 p-2">找不到符合的門市，請嘗試其他關鍵字。</p>';
+                } else {
+                    container.innerHTML = results.map(store => `
+                        <div class="bg-white p-3 rounded-lg border border-zera-tan/20 hover:border-zera-tan cursor-pointer flex justify-between items-center transition-colors cvs-store-item" 
+                             data-id="${store.id}" data-name="${store.name}" data-address="${store.address}">
+                            <div>
+                                <p class="text-sm font-bold text-zera-black">${store.name} <span class="text-[10px] text-zera-black/50 ml-2">ID: ${store.id}</span></p>
+                                <p class="text-xs text-zera-black/60 mt-1">${store.address}</p>
+                            </div>
+                            <button type="button" class="text-xs bg-zera-cream text-zera-tan px-3 py-1 rounded-md">選擇</button>
+                        </div>
+                    `).join('');
+
+                    // 綁定選擇門市事件
+                    document.querySelectorAll('.cvs-store-item').forEach(item => {
+                        item.addEventListener('click', function() {
+                            selectedShippingMeta = {
+                                type: method,
+                                store_id: this.dataset.id,
+                                store_name: this.dataset.name,
+                                store_address: this.dataset.address
+                            };
+                            
+                            // 顯示選中的門市並清空列表
+                            document.getElementById('cvs-store-name').textContent = `${this.dataset.name} (${this.dataset.id})`;
+                            document.getElementById('cvs-store-address').textContent = this.dataset.address;
+                            document.getElementById('cvs-selected-display').classList.remove('hidden');
+                            container.innerHTML = '';
+                        });
+                    });
+                }
+            } catch (error) {
+                alert(error.message);
+                console.error(error);
+            } finally {
+                cvsSearchBtn.disabled = false;
+                cvsSearchBtn.textContent = '搜尋門市';
+            }
+        });
+    }
+
+    // ==========================================
+    // 7. 最終寫入 Supabase 訂單 (Final Submit)
+    // ==========================================
+    const checkoutForm = document.getElementById('checkout-form');
+    if (checkoutForm) {
+        checkoutForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const method = logisticsSelect.value;
+            const shipName = document.getElementById('ship-name').value;
+            const shipPhone = document.getElementById('ship-phone').value;
+
+            // 驗證是否已確實選擇門市或填寫地址
+            if ((method === '7-11' || method === 'FamilyMart') && !selectedShippingMeta) {
+                alert('請先搜尋並選擇您要取貨的超商門市。');
+                return;
+            }
+
+            const submitBtn = document.getElementById('final-submit-btn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = '訂單處理中 Processing...';
+            submitBtn.classList.add('opacity-70', 'cursor-not-allowed');
+
+            try {
+                // 整理最終物流資料
+                const finalShippingInfo = {
+                    method: method,
+                    recipient_name: shipName,
+                    recipient_phone: shipPhone,
+                    address: (method === 'BlackCat' || method === 'HCT') ? shipAddressInput.value : selectedShippingMeta.store_address,
+                    store_id: selectedShippingMeta ? selectedShippingMeta.store_id : null,
+                    store_name: selectedShippingMeta ? selectedShippingMeta.store_name : null
+                };
+
+                const itemsAmount = parseInt(cartState.reduce((sum, item) => sum + (item.price * item.quantity), 0));
+                
+                const today = new Date();
+                const dateStr = today.getFullYear().toString() + 
+                               (today.getMonth() + 1).toString().padStart(2, '0') + 
+                               today.getDate().toString().padStart(2, '0');
+                const randomCode = Math.floor(1000 + Math.random() * 9000); 
+                const orderId = `ZR-${dateStr}-${randomCode}`;
+
+                // 準備寫入 Supabase
+                const orderData = {
+                    order_id: orderId,
+                    member_id: currentUser.id,
+                    items_amount: itemsAmount,
+                    shipping_fee: 0, 
+                    status: '處理中',
+                    items: cartState,
+                    // ★ 將完整的物流資料與發票預設資訊，統一包裝寫入 tax_info JSONB 欄位中
+                    tax_info: { 
+                        shipping_details: finalShippingInfo,
+                        invoice: { type: "二聯式", status: "pending" } 
+                    }
+                };
+
+                const { error: orderError } = await supabase
+                    .from('orders')
+                    .insert([orderData]);
+
+                if (orderError) throw orderError;
+
+                // 成功後清理與跳轉
+                await fetchAndRenderMemberData(currentUser.id, currentUser.email);
+                cartState = [];
+                updateCartUI();
+                checkoutForm.reset();
+                selectedShippingMeta = null;
+                document.getElementById('cvs-selected-display').classList.add('hidden');
+
+                alert(`訂單建立成功！\n您的訂單編號為：${orderId}`);
+
+                // 跳轉至會員中心 -> 歷史訂單
+                document.querySelectorAll('.view-section').forEach(sec => {
+                    sec.classList.remove('block');
+                    sec.classList.add('hidden');
+                });
+                
+                const memberView = document.getElementById('member-view');
+                if (memberView) {
+                    memberView.classList.remove('hidden');
+                    memberView.classList.add('block');
+                }
+                
+                const ordersTabBtn = document.querySelector('[data-target="tab-orders"]');
+                if (ordersTabBtn) ordersTabBtn.click();
+                
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            } catch (error) {
+                console.error('訂單建立失敗:', error);
+                alert(`結帳時發生錯誤：${error.message}`);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = '確認送出訂單 Submit Order';
+                submitBtn.classList.remove('opacity-70', 'cursor-not-allowed');
+            }
+        });
+    }
+
+    // ==========================================
     // 3. 手機版選單開關控制
     // ==========================================
     const mobileMenuToggleBtn = document.querySelector('[data-action="toggle-mobile-menu"]');
