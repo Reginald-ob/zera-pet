@@ -245,6 +245,83 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ==========================================
+    // 密碼揭露按鈕邏輯
+    // ==========================================
+    const togglePwdBtn = document.getElementById('toggle-password-btn');
+    const pwdInput = document.getElementById('auth-password');
+    const eyeClosed = document.getElementById('eye-closed-icon');
+    const eyeOpen = document.getElementById('eye-open-icon');
+
+    if (togglePwdBtn && pwdInput) {
+        togglePwdBtn.addEventListener('click', () => {
+            if (pwdInput.type === 'password') {
+                pwdInput.type = 'text';
+                eyeClosed.classList.add('hidden');
+                eyeClosed.classList.remove('block');
+                eyeOpen.classList.remove('hidden');
+                eyeOpen.classList.add('block');
+            } else {
+                pwdInput.type = 'password';
+                eyeOpen.classList.add('hidden');
+                eyeOpen.classList.remove('block');
+                eyeClosed.classList.remove('hidden');
+                eyeClosed.classList.add('block');
+            }
+        });
+    }
+
+    // ==========================================
+    // 未登入攔截 Modal 邏輯
+    // ==========================================
+    const closePromptBtn = document.querySelector('[data-action="close-auth-prompt"]');
+    const goToAuthBtn = document.getElementById('go-to-auth-btn');
+    const authPromptModal = document.getElementById('auth-prompt-modal');
+    const authPromptContent = document.getElementById('auth-prompt-content');
+
+    function closeAuthPrompt() {
+        authPromptModal.classList.add('opacity-0');
+        authPromptContent.classList.remove('scale-100', 'opacity-100');
+        authPromptContent.classList.add('scale-95', 'opacity-0');
+        setTimeout(() => {
+            authPromptModal.classList.add('hidden');
+            document.body.style.overflow = '';
+        }, 300);
+    }
+
+    if (closePromptBtn) closePromptBtn.addEventListener('click', closeAuthPrompt);
+    if (authPromptModal) {
+        authPromptModal.addEventListener('click', (e) => {
+            if (e.target === authPromptModal) closeAuthPrompt();
+        });
+    }
+
+    if (goToAuthBtn) {
+        goToAuthBtn.addEventListener('click', () => {
+            closeAuthPrompt();
+            
+            // 隱藏所有視圖
+            document.querySelectorAll('.view-section').forEach(section => {
+                section.classList.remove('block');
+                section.classList.add('hidden');
+            });
+
+            // 強制顯示登入視圖
+            const authView = document.getElementById('auth-view');
+            if (authView) {
+                authView.classList.remove('hidden');
+                authView.classList.add('block');
+            }
+
+            // 確保收合手機選單並滾動至頂部
+            const mobileMenu = document.getElementById('mobile-menu');
+            if (mobileMenu && !mobileMenu.classList.contains('hidden')) {
+                mobileMenu.classList.add('hidden');
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    }
+
+    // ==========================================
     // 1.6 串接 Supabase Auth API
     // ==========================================
     const authForm = document.getElementById('auth-form');
@@ -374,8 +451,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                     
                     <div class="mt-auto w-full flex items-center justify-between border-t border-zera-cream pt-4">
-                        <div class="text-zera-tan font-semibold text-sm tracking-wide">NT$ ${p.price.toLocaleString()}</div>
-                        <!-- ★ 這裡修改為 button 並呼叫 openProductModal -->
+                        <div class="text-zera-tan font-semibold text-sm tracking-wide">NT$ ${p.displayPrice}</div>
                         <button onclick="openProductModal('${p.id}')" class="bg-[#C6A87C] hover:bg-[#B59567] text-white text-[11px] px-4 py-1.5 rounded-full transition-colors font-medium tracking-wider shadow-sm focus:outline-none">立即購買</button>
                     </div>
                 </div>
@@ -440,18 +516,30 @@ document.addEventListener('DOMContentLoaded', () => {
                     variants['規格'] = colorOptions; // 您可依需求將此標籤改為「顏色」或「尺寸」
                 }
 
-                // 處理價格 (若表格中如 E001 有包含逗號，需先移除逗號再轉數字)
-                const parsedPrice = parseInt(String(row.price).replace(/,/g, ''), 10);
+                // 處理價格 (若表格中有包含逗號，需先移除逗號再轉數字)
+                const priceOptions = String(row.price).split(',').map(p => parseInt(p.replace(/[^0-9]/g, ''), 10) || 0);
+                
+                // 計算列表顯示用的價格字串 (單一價格或區間)
+                let displayPriceStr = '';
+                if (priceOptions.length > 1) {
+                    const minPrice = Math.min(...priceOptions);
+                    const maxPrice = Math.max(...priceOptions);
+                    displayPriceStr = minPrice === maxPrice ? minPrice.toLocaleString() : `${minPrice.toLocaleString()} ~ ${maxPrice.toLocaleString()}`;
+                } else {
+                    displayPriceStr = priceOptions[0].toLocaleString();
+                }
 
                 return {
                     id: row.product_ID,
-                    category_code: 'PET', // 如果有需要，可以將 category_code 加入表格欄位
+                    category_code: 'PET',
                     sub_code: row.sub_code,
                     name: row.name,
                     desc: row.desc,
-                    price: isNaN(parsedPrice) ? 0 : parsedPrice,
-                    images: [row.images], // 將單張圖片網址轉為陣列，配合先前的 Lightbox 邏輯
-                    raw_skus: skuOptions, // 保留原始的變體 SKU 代碼陣列
+                    prices: priceOptions,       // 儲存價格陣列
+                    displayPrice: displayPriceStr, // 儲存顯示字串
+                    price: priceOptions[0],     // 預設價格
+                    images: [row.images],
+                    raw_skus: skuOptions,
                     variants: variants
                 };
             });
@@ -488,6 +576,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const modalAddToCartButton = document.getElementById('modal-add-to-cart-btn');
 
     window.openProductModal = function(productId) {
+        // 攔截：未登入時跳出提示 Modal，終止後續開啟商品規格的動作
+        if (!currentUser) {
+            const promptModal = document.getElementById('auth-prompt-modal');
+            const promptContent = document.getElementById('auth-prompt-content');
+            promptModal.classList.remove('hidden');
+            void promptModal.offsetWidth;
+            promptModal.classList.remove('opacity-0');
+            promptContent.classList.remove('scale-95', 'opacity-0');
+            promptContent.classList.add('scale-100', 'opacity-100');
+            document.body.style.overflow = 'hidden';
+            return;
+        }
+
         currentModalProduct = allProducts.find(product => product.id === productId);
         if (!currentModalProduct || !modalEl || !modalContent) return;
 
@@ -539,7 +640,21 @@ document.addEventListener('DOMContentLoaded', () => {
         const modalPrice = document.getElementById('modal-price');
         if (modalImage) modalImage.src = currentModalProduct.images[0] || '';
         if (modalTitle) modalTitle.textContent = currentModalProduct.name;
-        if (modalPrice) modalPrice.textContent = `NT$ ${currentModalProduct.price.toLocaleString()}`;
+
+        const prices = currentModalProduct.prices || [currentModalProduct.price];
+        let currentPrice = prices[0] ?? currentModalProduct.price;
+        if (currentModalProduct.variants) {
+            const variantKey = Object.keys(currentModalProduct.variants)[0];
+            const selectedOption = currentModalSelections[variantKey];
+            const optionIndex = currentModalProduct.variants[variantKey].indexOf(selectedOption);
+
+            if (optionIndex > -1 && prices[optionIndex] !== undefined) {
+                currentPrice = prices[optionIndex];
+            }
+        }
+
+        currentModalProduct.activePrice = currentPrice;
+        if (modalPrice) modalPrice.textContent = `NT$ ${currentPrice.toLocaleString()}`;
         if (!modalVariantsContainer) return;
 
         modalVariantsContainer.replaceChildren();
@@ -607,7 +722,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 sku: skuParts.join('-'),
                 name: currentModalProduct.name,
                 variant: variantValues.join(' / ') || '無規格',
-                price: currentModalProduct.price,
+                price: currentModalProduct.activePrice,
                 quantity: currentModalQty,
                 img: currentModalProduct.images[0] || ''
             };
