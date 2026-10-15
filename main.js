@@ -1117,16 +1117,6 @@ document.addEventListener('DOMContentLoaded', () => {
             submitBtn.classList.add('opacity-70', 'cursor-not-allowed');
 
             try {
-                // 整理最終物流資料
-                const finalShippingInfo = {
-                    method: method,
-                    recipient_name: shipName,
-                    recipient_phone: shipPhone,
-                    address: (method === 'BlackCat' || method === 'HCT') ? shipAddressInput.value : selectedShippingMeta.store_address,
-                    store_id: selectedShippingMeta ? selectedShippingMeta.store_id : null,
-                    store_name: selectedShippingMeta ? selectedShippingMeta.store_name : null
-                };
-
                 const itemsAmount = parseInt(cartState.reduce((sum, item) => sum + (item.price * item.quantity), 0));
                 
                 const today = new Date();
@@ -1136,7 +1126,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 const randomCode = Math.floor(1000 + Math.random() * 9000); 
                 const orderId = `ZR-${dateStr}-${randomCode}`;
 
-                // 準備寫入 Supabase
                 const orderData = {
                     order_id: orderId,
                     member_id: currentUser.id,
@@ -1144,11 +1133,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     shipping_fee: 0, 
                     status: '處理中',
                     items: cartState,
-                    // ★ 將完整的物流資料與發票預設資訊，統一包裝寫入 tax_info JSONB 欄位中
-                    tax_info: { 
-                        shipping_details: finalShippingInfo,
-                        invoice: { type: "二聯式", status: "pending" } 
-                    }
+                    recipient_name: shipName,
+                    recipient_phone: shipPhone,
+                    shipping_method: method,
+                    shipping_address: (method === 'BlackCat' || method === 'HCT') ? shipAddressInput.value : selectedShippingMeta.store_address,
+                    store_id: selectedShippingMeta ? selectedShippingMeta.store_id : null,
+                    store_name: selectedShippingMeta ? selectedShippingMeta.store_name : null,
+                    tax_info: { type: "二聯式", status: "pending" }
                 };
 
                 const { error: orderError } = await supabase
@@ -1157,17 +1148,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 if (orderError) throw orderError;
 
-                // 成功後清理與跳轉
                 await fetchAndRenderMemberData(currentUser.id, currentUser.email);
                 cartState = [];
                 updateCartUI();
                 checkoutForm.reset();
                 selectedShippingMeta = null;
-                document.getElementById('cvs-selected-display').classList.add('hidden');
+                const cvsSelectedDisplay = document.getElementById('cvs-selected-display');
+                if (cvsSelectedDisplay) cvsSelectedDisplay.classList.add('hidden');
 
                 alert(`訂單建立成功！\n您的訂單編號為：${orderId}`);
 
-                // 跳轉至會員中心 -> 歷史訂單
                 document.querySelectorAll('.view-section').forEach(sec => {
                     sec.classList.remove('block');
                     sec.classList.add('hidden');
@@ -1181,7 +1171,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 const ordersTabBtn = document.querySelector('[data-target="tab-orders"]');
                 if (ordersTabBtn) ordersTabBtn.click();
-                
                 window.scrollTo({ top: 0, behavior: 'smooth' });
 
             } catch (error) {
