@@ -1,7 +1,8 @@
 // ==========================================
     // 0. 全域狀態管理 (State Management) 擴充
     // ==========================================
-// Auth 狀態
+    
+    // Auth 狀態
     let currentUser = null; 
     let isLoginMode = true; 
 
@@ -142,20 +143,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const SUPABASE_ANON_KEY = 'sb_publishable_4_-jBNZHWDD7Imp6GKkXXg_6FxxtOyP';
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    let currentUser = null;
-    let isLoginMode = true;
-
     async function checkSession() {
         try {
-            const { data, error } = await supabase.auth.getSession();
+            const { data: { session }, error } = await supabase.auth.getSession();
             if (error) {
                 console.error('讀取登入狀態失敗：', error);
                 return;
             }
 
-            if (data.session) {
-                currentUser = data.session.user;
-                await fetchMemberData(currentUser.id);
+            if (session) {
+                currentUser = session.user;
+                await fetchAndRenderMemberData(currentUser.id, currentUser.email);
             }
         } catch (error) {
             console.error('檢查登入狀態時發生錯誤：', error);
@@ -343,11 +341,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (error) throw error;
 
                     currentUser = data.user;
-                    alert('登入成功！');
-                    document.querySelector('[data-view-target="member-view"]').click();
+                    await fetchAndRenderMemberData(currentUser.id, currentUser.email);
+                    alert('登入成功！歡迎回到 ZERA。');
                 } else {
                     const phone = document.getElementById('auth-phone').value;
                     const petPref = document.getElementById('auth-pet-preference').value;
+                    if (!phone || !petPref) {
+                        throw new Error('請填寫手機號碼與寵物夥伴類型');
+                    }
+
                     const { data: authData, error: authError } = await supabase.auth.signUp({
                         email,
                         password
@@ -365,12 +367,23 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (insertError) throw insertError;
                     }
 
-                    alert('註冊成功！');
                     currentUser = authData.user;
-                    document.querySelector('[data-view-target="member-view"]').click();
+                    if (currentUser) {
+                        await fetchAndRenderMemberData(currentUser.id, currentUser.email);
+                    }
+                    alert('註冊成功！已為您開啟專屬會員權益。');
                 }
+
+                authForm.reset();
+                document.querySelector('[data-view-target="member-view"]').click();
             } catch (error) {
-                alert(`發生錯誤：${error.message}`);
+                let errorMsg = error.message;
+                if (errorMsg.includes('Invalid login credentials')) errorMsg = '帳號或密碼錯誤。';
+                if (errorMsg.includes('User already registered')) errorMsg = '此 Email 已經註冊過了。';
+                if (errorMsg.includes('duplicate key value violates unique constraint "members_phone_number_key"')) {
+                    errorMsg = '此手機號碼已被使用。';
+                }
+                alert(`發生錯誤：${errorMsg}`);
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.textContent = originalText;
@@ -379,21 +392,47 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    async function fetchMemberData(userId) {
-        const { data, error } = await supabase
-            .from('members')
-            .select('phone_number, tier, pet_preference, total_spent, reward_points')
-            .eq('id', userId)
-            .single();
+    async function fetchAndRenderMemberData(userId, email) {
+        try {
+            const { data, error } = await supabase
+                .from('members')
+                .select('phone_number, tier, pet_preference, total_spent, reward_points')
+                .eq('id', userId)
+                .single();
 
-        if (error) {
-            console.error('載入會員資料失敗：', error);
-            return;
-        }
+            if (error) throw error;
 
-        if (data) {
-            console.log('載入會員資料：', data);
+            if (data) {
+                const namePrefix = email ? email.split('@')[0] : '會員';
+                const memberNameDisplay = document.getElementById('member-name-display');
+                if (memberNameDisplay) memberNameDisplay.textContent = namePrefix;
+                console.log('會員資料載入成功:', data);
+            }
+        } catch (error) {
+            console.error('無法獲取會員詳細資料:', error.message);
         }
+    }
+
+    // ==========================================
+    // 2. 登出邏輯 (Logout)
+    // ==========================================
+    const logoutBtn = document.querySelector('[data-action="logout"]');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', async () => {
+            if (!confirm('確定要登出您的帳號嗎？')) return;
+
+            const { error } = await supabase.auth.signOut();
+            if (error) {
+                alert(`登出失敗：${error.message}`);
+                return;
+            }
+
+            currentUser = null;
+            cartState = [];
+            updateCartUI();
+            alert('您已成功登出。');
+            document.querySelector('[data-view-target="home-view"]').click();
+        });
     }
 
     // ==========================================
