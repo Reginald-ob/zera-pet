@@ -352,20 +352,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     const { data: authData, error: authError } = await supabase.auth.signUp({
                         email,
-                        password
-                    });
-                    if (authError) throw authError;
-
-                    if (authData.user) {
-                        const { error: insertError } = await supabase
-                            .from('members')
-                            .insert([{
-                                id: authData.user.id,
+                        password,
+                        options: {
+                            data: {
                                 phone_number: phone,
                                 pet_preference: petPref
-                            }]);
-                        if (insertError) throw insertError;
-                    }
+                            }
+                        }
+                    });
+                    if (authError) throw authError;
 
                     currentUser = authData.user;
                     if (currentUser) {
