@@ -416,31 +416,34 @@ document.addEventListener('DOMContentLoaded', () => {
         const value = wrap.querySelector(`.${type}-text-value`);
         const nodes = wrap.querySelector(`.${type}-text-nodes`);
         const badge = document.getElementById(`${type}-tier-badge`);
-        const track = wrap.querySelector('.progress-track'); // 抓取進度條底層
+        const track = wrap.querySelector('.progress-track');
+        if (bar) bar.style.width = '0%';
 
         if (isActive) {
-            // ★ 高亮顯示：深色背景 (charcoal) + 棕金色進度條 (#C6A87C)
             wrap.className = 'transition-all duration-300 p-4 bg-zera-charcoal rounded-xl shadow-md border border-zera-tan/20 mt-2';
             if (title) title.className = `text-[10px] tracking-widest font-bold ${type}-text-title text-[#C6A87C] uppercase`;
             if (value) value.className = `text-[10px] font-serif ${type}-text-value text-zera-cream`;
             if (nodes) nodes.className = `flex justify-between text-[8.5px] mt-1.5 font-serif tracking-wider ${type}-text-nodes text-zera-cream/60`;
-            
-            // 棕金色進度條 + 微微發光效果
-            if (bar) bar.className = 'absolute top-0 left-0 h-full rounded-full transition-all duration-1000 bg-[#C6A87C] shadow-[0_0_8px_rgba(198,168,124,0.4)]';
+            if (bar) bar.className = 'absolute top-0 left-0 h-full rounded-full transition-all duration-1000 bg-[#C6A87C] shadow-[0_0_8px_rgba(198,168,124,0.4)] w-0';
             if (track) track.className = 'progress-track relative w-full h-1.5 bg-white/10 rounded-full overflow-hidden';
-            
-            // 徽章改為純黑底 + 棕金字，以融入深色卡片
-            if (badge) badge.className = `bg-black text-[#C6A87C] border border-[#C6A87C]/30 text-[9px] px-2 py-0.5 rounded-full tracking-widest font-serif transition-colors whitespace-nowrap`;
+            if (badge) badge.className = 'bg-black text-[#C6A87C] border border-[#C6A87C]/30 text-[9px] px-2 py-0.5 rounded-full tracking-widest font-serif transition-colors whitespace-nowrap';
         } else {
-            // 灰底白字顯示：未選中派系
             wrap.className = 'transition-all duration-300 p-4 bg-neutral-400 rounded-xl opacity-80 mt-2';
             if (title) title.className = `text-[10px] tracking-widest font-bold ${type}-text-title text-white uppercase`;
             if (value) value.className = `text-[10px] font-serif ${type}-text-value text-white`;
             if (nodes) nodes.className = `flex justify-between text-[8.5px] mt-1.5 font-serif tracking-wider ${type}-text-nodes text-white/80`;
-            if (bar) bar.className = 'absolute top-0 left-0 h-full rounded-full transition-all duration-1000 bg-white/90 shadow-sm';
+            if (bar) bar.className = 'absolute top-0 left-0 h-full rounded-full transition-all duration-1000 bg-white/90 shadow-sm w-0';
             if (track) track.className = 'progress-track relative w-full h-1.5 bg-black/10 rounded-full overflow-hidden';
-            if (badge) badge.className = `bg-black/20 text-white text-[9px] px-2 py-0.5 rounded-full tracking-widest font-serif transition-colors whitespace-nowrap`;
+            if (badge) badge.className = 'bg-black/20 text-white text-[9px] px-2 py-0.5 rounded-full tracking-widest font-serif transition-colors whitespace-nowrap';
         }
+    }
+
+    function getTierTitle(type, spent) {
+        const titles = type === 'dog'
+            ? ['狗奴才', '吉娃娃', '哈士奇', '狼王']
+            : ['貓奴才', '咪咪', '虎', '獅王'];
+        const tierIndex = spent >= 3000 ? 3 : spent >= 1000 ? 2 : spent >= 500 ? 1 : 0;
+        return titles[tierIndex];
     }
 
     // ==========================================
@@ -448,7 +451,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // ==========================================
     async function fetchAndRenderMemberData(userId, email) {
         try {
-            // 1. 取得會員基本資料
             const { data: memberData, error: memberError } = await supabase
                 .from('members')
                 .select('phone_number, tier, pet_preference, total_spent, reward_points')
@@ -458,32 +460,48 @@ document.addEventListener('DOMContentLoaded', () => {
             if (memberError) throw memberError;
 
             if (memberData) {
-                // 渲染名字與點數
                 const namePrefix = email ? email.split('@')[0] : '會員';
                 const memberNameDisplay = document.getElementById('member-name-display');
                 if (memberNameDisplay) memberNameDisplay.textContent = namePrefix;
-                
+
                 const totalSpentDisplay = document.getElementById('member-total-spent');
                 const rewardPointsDisplay = document.getElementById('member-reward-points');
-                if (totalSpentDisplay) totalSpentDisplay.textContent = `NT$ ${(Number(memberData.total_spent) || 0).toLocaleString()}`;
-                if (rewardPointsDisplay) rewardPointsDisplay.innerHTML = `${(Number(memberData.reward_points) || 0).toLocaleString()} <span class="text-sm">pts</span>`;
+                const totalSpent = Number(memberData.total_spent) || 0;
+                const rewardPoints = Number(memberData.reward_points) || 0;
+                if (totalSpentDisplay) totalSpentDisplay.textContent = `NT$ ${totalSpent.toLocaleString()}`;
+                if (rewardPointsDisplay) {
+                    rewardPointsDisplay.innerHTML = `${rewardPoints.toLocaleString()} <span class="text-[10px] sm:text-xs">pts</span>`;
+                }
 
-                // 2. 取得用戶的歷史訂單，用以判斷 D/C/E 產品的各自消費額度
                 const { data: ordersData, error: ordersError } = await supabase
                     .from('orders')
                     .select('items')
                     .eq('member_id', userId);
 
+                if (ordersError) {
+                    console.warn('讀取訂單發生權限錯誤，將切換為防呆顯示模式:', ordersError.message);
+                }
+
                 let dogSpent = 0;
                 let catSpent = 0;
 
-                // 若有訂單，依據產品 ID 開頭字母 (D/C/E) 計算
                 if (ordersData && ordersData.length > 0) {
                     ordersData.forEach(order => {
-                        const items = typeof order.items === 'string' ? JSON.parse(order.items) : order.items;
+                        let items;
+                        try {
+                            items = typeof order.items === 'string' ? JSON.parse(order.items) : order.items;
+                        } catch (error) {
+                            console.warn('略過格式錯誤的訂單明細:', error.message);
+                            return;
+                        }
+
+                        if (!Array.isArray(items)) {
+                            console.warn('略過格式錯誤的訂單明細: items 必須是陣列');
+                            return;
+                        }
+
                         items.forEach(item => {
-                            // 抓取 product_id (例如 D001, C002, E005)
-                            const prodId = item.product_id || item.sku || ''; 
+                            const prodId = item.product_id || item.sku || '';
                             const prefix = prodId.charAt(0).toUpperCase();
                             const lineTotal = (Number(item.price) || 0) * (Number(item.quantity) || 0);
 
@@ -492,25 +510,24 @@ document.addEventListener('DOMContentLoaded', () => {
                             } else if (prefix === 'C') {
                                 catSpent += lineTotal;
                             } else if (prefix === 'E') {
-                                dogSpent += (lineTotal / 2); // 貓狗各半
+                                dogSpent += lineTotal / 2;
                                 catSpent += (lineTotal / 2);
                             }
                         });
                     });
                 } else {
-                    // ★ 測試環境防呆：若尚無訂單 (例如您手動去後台改 total_spent)，則依據偏好分配總額以便測試
-                    const fallbackSpent = Number(memberData.total_spent) || 0;
                     if (memberData.pet_preference === '狗派') {
-                        dogSpent = fallbackSpent;
+                        dogSpent = totalSpent;
                     } else if (memberData.pet_preference === '貓派') {
-                        catSpent = fallbackSpent;
+                        catSpent = totalSpent;
                     } else {
-                        dogSpent = fallbackSpent / 2;
-                        catSpent = fallbackSpent / 2;
+                        dogSpent = totalSpent / 2;
+                        catSpent = totalSpent / 2;
                     }
                 }
 
-                // 3. 渲染進度條與稱號徽章
+                console.log(`[會員狀態] 總額: ${totalSpent}, 狗派貢獻: ${dogSpent}, 貓派貢獻: ${catSpent}`);
+
                 const dogProgressValue = document.getElementById('dog-progress-value');
                 const catProgressValue = document.getElementById('cat-progress-value');
                 const dogTierBadge = document.getElementById('dog-tier-badge');
@@ -518,7 +535,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 const dogProgressBar = document.getElementById('dog-progress-bar');
                 const catProgressBar = document.getElementById('cat-progress-bar');
 
-                // 動態寫入等級稱呼 (狗奴才/吉娃娃 等)
                 if (dogTierBadge) dogTierBadge.textContent = getTierTitle('dog', dogSpent);
                 if (catTierBadge) catTierBadge.textContent = getTierTitle('cat', catSpent);
 
@@ -528,12 +544,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 const dogProgressPercent = calculateProgressWidth(dogSpent);
                 const catProgressPercent = calculateProgressWidth(catSpent);
 
-                window.setTimeout(() => {
-                    if (dogProgressBar) dogProgressBar.style.width = `${dogProgressPercent}%`;
-                    if (catProgressBar) catProgressBar.style.width = `${catProgressPercent}%`;
-                }, 100);
-
-                // 4. 套用高亮深色底與灰底白字樣式
                 if (memberData.pet_preference === '狗派') {
                     applyProgressStyle('dog', true);
                     applyProgressStyle('cat', false);
@@ -545,6 +555,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     applyProgressStyle('cat', true);
                 }
 
+                window.setTimeout(() => {
+                    if (dogProgressBar) dogProgressBar.style.width = `${dogProgressPercent}%`;
+                    if (catProgressBar) catProgressBar.style.width = `${catProgressPercent}%`;
+                }, 100);
             }
         } catch (error) {
             console.error('無法獲取會員詳細資料:', error.message);
