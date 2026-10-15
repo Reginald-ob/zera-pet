@@ -328,9 +328,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function renderProducts() {
             const grid = document.getElementById('product-grid');
-            // 注意：這裡的 allProducts 是我們前一步驟從 fetchProductsData 載入的變數
-            // 實務上您可能需要結合 state.category 進行過濾
-            let items = [...allProducts]; // 這裡先假設顯示所有商品
+            // 先依目前選取的分類過濾商品
+            let items = allProducts.filter(product => product.sub_code === state.category);
 
             if (state.searchQuery) {
                 items = items.filter(p => 
@@ -384,6 +383,40 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
     // ==========================================
+    // 分類選單邏輯
+    // ==========================================
+    window.handleCategoryClick = function(category) {
+        state.category = category;
+        state.searchQuery = '';
+        state.sortOrder = 'default';
+        
+        const searchInput = document.getElementById('searchInput');
+        const sortSelect = document.getElementById('sortSelect');
+        if (searchInput) searchInput.value = '';
+        if (sortSelect) sortSelect.value = 'default';
+        
+        renderCategoryButtons();
+        renderProducts();
+    };
+
+    function renderCategoryButtons() {
+        const container = document.getElementById('category-buttons-container');
+        if (!container) return;
+        
+        container.innerHTML = availableCategories.map(cat => {
+            const isActive = state.category === cat;
+            const activeStyle = "bg-zera-tan text-zera-cream border-zera-tan shadow-md";
+            const inactiveStyle = "bg-white text-zera-black border-zera-tan/30 hover:bg-zera-cream hover:border-zera-tan/60";
+            
+            return `
+                <button onclick="handleCategoryClick('${cat}')" class="px-5 py-2 text-xs sm:text-sm font-medium rounded-full border transition-all duration-300 ${isActive ? activeStyle : inactiveStyle}">
+                    ${cat}
+                </button>
+            `;
+        }).join('');
+    }
+
+    // ==========================================
     // 3. 商品資料獲取 (連接 Google Sheets API)
     // ==========================================
     async function fetchProductsData() {
@@ -423,9 +456,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 };
             });
             
-            // 資料轉換完畢後，執行首次渲染
+            // 萃取所有不重複的子類別作為分類按鈕
+            availableCategories = [...new Set(allProducts.map(product => product.sub_code))];
+
+            // 預設選中第一個分類
+            if (availableCategories.length > 0 && !state.category) {
+                state.category = availableCategories[0];
+            }
+
+            renderCategoryButtons();
             renderProducts();
-            renderCategoryButtons(); // 若您的分類選單是根據資料動態生成，需再次呼叫
 
         } catch (error) {
             console.error('商品資料載入失敗:', error);
