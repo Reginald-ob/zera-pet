@@ -1,13 +1,25 @@
 // ==========================================
     // 0. 全域狀態管理 (State Management) 擴充
     // ==========================================
+// Auth 狀態
+    let currentUser = null; 
+    let isLoginMode = true; 
+
+    // 購物車與 Modal 狀態
     let cartState = []; 
-    let allProducts = []; // 存放從 API 獲取的所有商品資料
-    let currentModalProduct = null; // 當前 Modal 正在檢視的商品
-    let currentModalSelections = {}; // 當前 Modal 選中的規格 (例如: { color: '黑色', size: 'M' })
+    let allProducts = []; 
+    let currentModalProduct = null; 
+    let currentModalSelections = {}; 
     let currentModalQty = 1;
-    // 購物車資料結構範例：
-    // { sku: 'PET-OUT-001', name: '機能雨衣', variant: '黑色/L', price: 1880, quantity: 1, img: '...' }
+
+    // 首頁商品列表所需的過濾與渲染狀態
+    let state = {
+        category: '',      // 當前選擇的分類
+        searchQuery: '',   // 搜尋關鍵字
+        sortOrder: 'default' // 排序方式
+    };
+    let availableCategories = []; // 存放所有可用的分類
+    let currentRenderedItems = []; // 當前畫面上渲染的商品陣列
 
     // ==========================================
     // 2. 購物車核心邏輯 (Cart Management)
