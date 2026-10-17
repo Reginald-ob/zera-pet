@@ -1029,7 +1029,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const keyword = document.getElementById('cvs-keyword').value.trim();
             const method = logisticsSelect.value;
             if (!keyword) {
-                alert('請輸入地址或路名關鍵字');
+                alert('請輸入地址、路名或店名關鍵字');
                 return;
             }
 
@@ -1037,17 +1037,18 @@ document.addEventListener('DOMContentLoaded', () => {
             cvsSearchBtn.textContent = '搜尋中...';
             
             try {
-                // 依據選擇的超商載入對應的 JSON 檔案 (請確保檔案放在專案根目錄)
-                const jsonFile = method === '7-11' ? 'cvs-list.json' : 'cvs-list(1).json';
+                // 依據選擇的超商載入對應的新版 JSON 檔案
+                const jsonFile = method === '7-11' ? 's_data.json' : 'f_data.json';
                 const response = await fetch(jsonFile);
                 
-                if (!response.ok) throw new Error('無法讀取門市資料，請確認 JSON 檔案是否存在。');
+                if (!response.ok) throw new Error(`無法讀取門市資料，請確認 ${jsonFile} 檔案是否放置於正確路徑。`);
                 const storeList = await response.json();
 
-                // 依據地址或路名過濾
+                // 依據地址、路名或店名過濾
                 const results = storeList.filter(store => 
                     (store.address && store.address.includes(keyword)) || 
-                    (store.road && store.road.includes(keyword))
+                    (store.road && store.road.includes(keyword)) ||
+                    (store.name && store.name.includes(keyword))
                 );
 
                 const container = document.getElementById('cvs-results-container');
@@ -1061,7 +1062,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 <p class="text-sm font-bold text-zera-black">${store.name} <span class="text-[10px] text-zera-black/50 ml-2">ID: ${store.id}</span></p>
                                 <p class="text-xs text-zera-black/60 mt-1">${store.address}</p>
                             </div>
-                            <button type="button" class="text-xs bg-zera-cream text-zera-tan px-3 py-1 rounded-md">選擇</button>
+                            <button type="button" class="text-xs bg-zera-cream text-zera-tan px-3 py-1 rounded-md shrink-0">選擇</button>
                         </div>
                     `).join('');
 
