@@ -21,6 +21,7 @@
     };
     let availableCategories = []; // 存放所有可用的分類
     let currentRenderedItems = []; // 當前畫面上渲染的商品陣列
+    let currentPaymentOrder = null; // 紀錄當前正在付款的訂單資訊
 
     // ==========================================
     // 2. 購物車核心邏輯 (Cart Management)
@@ -473,56 +474,68 @@ document.addEventListener('DOMContentLoaded', () => {
                     rewardPointsDisplay.innerHTML = `${rewardPoints.toLocaleString()} <span class="text-[10px] sm:text-xs">pts</span>`;
                 }
 
+                // 2. 嘗試獲取訂單來計算 D/C/E 並動態渲染歷史訂單
+                // ★ 注意：這裡改成 select('*') 以獲取完整訂單欄位，並照建立時間倒序
                 const { data: ordersData, error: ordersError } = await supabase
                     .from('orders')
-                    .select('items')
-                    .eq('member_id', userId);
+                    .select('*')
+                    .eq('member_id', userId)
+                    .order('created_at', { ascending: false });
 
-                if (ordersError) {
-                    console.warn('讀取訂單發生權限錯誤，將切換為防呆顯示模式:', ordersError.message);
-                }
+                if (ordersError) console.warn('讀取訂單發生權限錯誤:', ordersError.message);
 
                 let dogSpent = 0;
                 let catSpent = 0;
 
-                if (ordersData && ordersData.length > 0) {
-                    ordersData.forEach(order => {
-                        let items;
-                        try {
-                            items = typeof order.items === 'string' ? JSON.parse(order.items) : order.items;
-                        } catch (error) {
-                            console.warn('略過格式錯誤的訂單明細:', error.message);
-                            return;
-                        }
-
-                        if (!Array.isArray(items)) {
-                            console.warn('略過格式錯誤的訂單明細: items 必須是陣列');
-                            return;
-                        }
-
-                        items.forEach(item => {
-                            const prodId = item.product_id || item.sku || '';
-                            const prefix = prodId.charAt(0).toUpperCase();
-                            const lineTotal = (Number(item.price) || 0) * (Number(item.quantity) || 0);
-
-                            if (prefix === 'D') {
-                                dogSpent += lineTotal;
-                            } else if (prefix === 'C') {
-                                catSpent += lineTotal;
-                            } else if (prefix === 'E') {
-                                dogSpent += lineTotal / 2;
-                                catSpent += (lineTotal / 2);
-                            }
-                        });
-                    });
-                } else {
-                    if (memberData.pet_preference === '狗派') {
-                        dogSpent = totalSpent;
-                    } else if (memberData.pet_preference === '貓派') {
-                        catSpent = totalSpent;
+                const ordersContainer = document.getElementById('member-orders-container');
+                if (ordersContainer) {
+                    if (!ordersData || ordersData.length === 0) {
+                        ordersContainer.innerHTML = '<p class="text-center py-8 text-zera-black/50 text-sm italic">目前尚無歷史訂單。</p>';
                     } else {
-                        dogSpent = totalSpent / 2;
-                        catSpent = totalSpent / 2;
+                        let html = '';
+                        ordersData.forEach(order => {
+                            // 計算進度條額度
+                            const items = typeof order.items === 'string' ? JSON.parse(order.items) : order.items;
+                            items.forEach(item => {
+                                const prefix = (item.product_id || item.sku || '').charAt(0).toUpperCase();
+                                const lineTotal = (Number(item.price) || 0) * (Number(item.quantity) || 0);
+                                if (prefix === 'D') dogSpent += lineTotal;
+                                else if (prefix === 'C') catSpent += lineTotal;
+                                else if (prefix === 'E') { dogSpent += (lineTotal / 2); catSpent += (lineTotal / 2); }
+                            });
+
+                            // 渲染歷史訂單列表
+                            const itemNames = items.map(i => i.name).join('、');
+                            const itemCount = items.reduce((sum, i) => sum + i.quantity, 0);
+
+                            const isUnpaid = order.status === '未結帳';
+                            const statusClass = isUnpaid ? 'bg-red-800 text-white' : (order.status === '已完成' ? 'bg-zera-cream text-zera-black/50' : 'bg-zera-tan text-zera-cream');
+
+                            const dateObj = new Date(order.created_at);
+                            const dateStr = isNaN(dateObj) ? '' : `${dateObj.getFullYear()}.${String(dateObj.getMonth()+1).padStart(2,'0')}.${String(dateObj.getDate()).padStart(2,'0')} ${String(dateObj.getHours()).padStart(2,'0')}:${String(dateObj.getMinutes()).padStart(2,'0')}`;
+
+                            html += `
+                                <div class="bg-white rounded-2xl border ${isUnpaid ? 'border-red-800/40 shadow-md' : 'border-zera-tan/10'} p-5 sm:p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 hover:shadow-md transition-all duration-300">
+                                    <div class="flex-1 min-w-0 w-full">
+                                        <div class="flex items-center gap-3 mb-2 flex-wrap">
+                                            <span class="font-serif text-sm font-bold tracking-wider ${isUnpaid ? 'text-red-800' : 'text-zera-black'}">#${order.order_id}</span>
+                                            <span class="text-[10px] px-2 py-0.5 rounded-sm tracking-widest ${statusClass}">${order.status}</span>
+                                            ${isUnpaid ? '<span class="text-xs text-red-800 font-bold animate-pulse inline-block">請盡速完成結帳</span>' : ''}
+                                        </div>
+                                        <p class="text-xs text-zera-black/50 mb-1">${dateStr} 成立</p>
+                                        <p class="text-sm text-zera-black mt-2 truncate">${itemNames} 等 ${itemCount} 件商品</p>
+                                    </div>
+                                    <div class="w-full md:w-auto flex flex-row md:flex-col items-center justify-between md:items-end gap-3 border-t md:border-t-0 border-zera-cream pt-4 md:pt-0 shrink-0">
+                                        <span class="font-serif text-lg ${isUnpaid ? 'text-red-800' : 'text-zera-black/80'}">NT$ ${order.items_amount.toLocaleString()}</span>
+                                        ${isUnpaid
+                                            ? `<button onclick="window.resumePayment('${order.order_id}',${order.items_amount})" class="text-xs border border-red-800 bg-red-800 text-white hover:bg-white hover:text-red-800 px-6 py-2 rounded-full transition-colors font-bold tracking-widest shadow-sm">前往結帳</button>`
+                                            : `<button class="text-xs border border-zera-tan/40 text-zera-black/60 hover:bg-zera-tan hover:text-zera-cream px-5 py-1.5 rounded-full transition-colors tracking-widest">查看詳情</button>`
+                                        }
+                                    </div>
+                                </div>
+                            `;
+                        });
+                        ordersContainer.innerHTML = html;
                     }
                 }
 
@@ -1132,7 +1145,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     member_id: currentUser.id,
                     items_amount: itemsAmount,
                     shipping_fee: 0, 
-                    status: '處理中',
+                    status: '未結帳',
                     items: cartState,
                     recipient_name: shipName,
                     recipient_phone: shipPhone,
@@ -1150,6 +1163,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (orderError) throw orderError;
 
                 await fetchAndRenderMemberData(currentUser.id, currentUser.email);
+                currentPaymentOrder = { id: orderId, amount: itemsAmount };
+                document.getElementById('payment-order-id').textContent = orderId;
+                document.getElementById('payment-amount').textContent = `NT$ ${itemsAmount.toLocaleString()}`;
+
                 cartState = [];
                 updateCartUI();
                 checkoutForm.reset();
@@ -1157,21 +1174,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 const cvsSelectedDisplay = document.getElementById('cvs-selected-display');
                 if (cvsSelectedDisplay) cvsSelectedDisplay.classList.add('hidden');
 
-                alert(`訂單建立成功！\n您的訂單編號為：${orderId}`);
-
                 document.querySelectorAll('.view-section').forEach(sec => {
                     sec.classList.remove('block');
                     sec.classList.add('hidden');
                 });
                 
-                const memberView = document.getElementById('member-view');
-                if (memberView) {
-                    memberView.classList.remove('hidden');
-                    memberView.classList.add('block');
+                const paymentView = document.getElementById('payment-view');
+                if (paymentView) {
+                    paymentView.classList.remove('hidden');
+                    paymentView.classList.add('block');
                 }
-                
-                const ordersTabBtn = document.querySelector('[data-target="tab-orders"]');
-                if (ordersTabBtn) ordersTabBtn.click();
                 window.scrollTo({ top: 0, behavior: 'smooth' });
 
             } catch (error) {
@@ -1186,6 +1198,93 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ==========================================
+    // 8. 訂單付款邏輯 (Payment Gateway)
+    // ==========================================
+    const processPaymentBtn = document.getElementById('process-payment-btn');
+    const cancelPaymentBtn = document.getElementById('cancel-payment-btn');
+
+    if (processPaymentBtn) {
+        processPaymentBtn.addEventListener('click', async () => {
+            if (!currentPaymentOrder) return;
+            const btn = processPaymentBtn;
+            btn.disabled = true;
+            btn.textContent = '金流處理中 Processing...';
+            btn.classList.add('opacity-70', 'cursor-not-allowed');
+
+            try {
+                const method = document.getElementById('payment-method-select').value;
+                // 模擬與金流閘道連線時間
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                
+                // 模擬付款成功，將訂單狀態更新為 '處理中'
+                const { error } = await supabase
+                    .from('orders')
+                    .update({ status: '處理中' })
+                    .eq('order_id', currentPaymentOrder.id);
+                
+                if (error) throw error;
+
+                alert(`付款成功！使用方式：${method}\n我們將盡速為您安排出貨。`);
+                
+                // 刷新會員中心歷史訂單並跳轉
+                await fetchAndRenderMemberData(currentUser.id, currentUser.email);
+                
+                document.querySelectorAll('.view-section').forEach(sec => {
+                    sec.classList.remove('block');
+                    sec.classList.add('hidden');
+                });
+                document.getElementById('member-view').classList.remove('hidden');
+                document.getElementById('member-view').classList.add('block');
+                const ordersTabBtn = document.querySelector('[data-target="tab-orders"]');
+                if (ordersTabBtn) ordersTabBtn.click();
+                
+            } catch (err) {
+                alert(`付款失敗: ${err.message}`);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '確認付款 Pay Now';
+                btn.classList.remove('opacity-70', 'cursor-not-allowed');
+            }
+        });
+    }
+
+    // 放棄當下結帳，稍後再付
+    if (cancelPaymentBtn) {
+        cancelPaymentBtn.addEventListener('click', async () => {
+            alert('訂單已為您保留，您可隨時至會員中心「歷史訂單」中完成結帳手續。');
+            await fetchAndRenderMemberData(currentUser.id, currentUser.email);
+            
+            document.querySelectorAll('.view-section').forEach(sec => {
+                sec.classList.remove('block');
+                sec.classList.add('hidden');
+            });
+            document.getElementById('member-view').classList.remove('hidden');
+            document.getElementById('member-view').classList.add('block');
+            const ordersTabBtn = document.querySelector('[data-target="tab-orders"]');
+            if (ordersTabBtn) ordersTabBtn.click();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    }
+
+    // 提供給歷史訂單清單按鈕呼叫的函數
+    window.resumePayment = function(orderId, amount) {
+        currentPaymentOrder = { id: orderId, amount: amount };
+        document.getElementById('payment-order-id').textContent = orderId;
+        document.getElementById('payment-amount').textContent = `NT$ ${amount.toLocaleString()}`;
+        
+        document.querySelectorAll('.view-section').forEach(sec => {
+            sec.classList.remove('block');
+            sec.classList.add('hidden');
+        });
+        const paymentView = document.getElementById('payment-view');
+        if (paymentView) {
+            paymentView.classList.remove('hidden');
+            paymentView.classList.add('block');
+        }
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    // ==========================================
     // 3. 手機版選單開關控制
     // ==========================================
     const mobileMenuToggleBtn = document.querySelector('[data-action="toggle-mobile-menu"]');
@@ -1195,4 +1294,121 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+
+    // ==========================================
+    // 8. 導覽列錨點點擊自動返回首頁邏輯
+    // ==========================================
+    const navAnchorLinks = document.querySelectorAll('nav a[href^="#"], #mobile-menu a[href^="#"]');
+    
+    navAnchorLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault(); // 阻擋預設跳轉，由 JS 接管
+            
+            // 1. 強制顯示首頁視圖 (home-view)，隱藏其他視圖
+            document.querySelectorAll('.view-section').forEach(sec => {
+                sec.classList.remove('block');
+                sec.classList.add('hidden');
+            });
+            const homeView = document.getElementById('home-view');
+            if (homeView) {
+                homeView.classList.remove('hidden');
+                homeView.classList.add('block');
+            }
+
+            // 2. 如果是手機版，點擊後自動收合選單
+            const mobileMenu = document.getElementById('mobile-menu');
+            if (mobileMenu && !mobileMenu.classList.contains('hidden')) {
+                mobileMenu.classList.add('hidden');
+            }
+
+            // 3. 抓取目標區塊並平滑滾動 (給予 50ms 延遲讓視圖先渲染完成)
+            const targetId = link.getAttribute('href').substring(1);
+            const targetElement = document.getElementById(targetId);
+            if (targetElement) {
+                setTimeout(() => {
+                    targetElement.scrollIntoView({ behavior: 'smooth' });
+                }, 50);
+            }
+        });
+    });
+
+    // ==========================================
+    // 9. 產品圖片放大鏡 (Lightbox) 邏輯
+    // ==========================================
+    let lightboxState = {
+        images: [],
+        currentIndex: 0
+    };
+
+    // 暴露給 HTML onClick 呼叫的函數
+    window.openLightbox = function(itemIndex, imgIndex) {
+        // currentRenderedItems 存放了當前畫面上的商品列表
+        const product = currentRenderedItems[itemIndex];
+        if (!product || !product.images) return;
+
+        lightboxState.images = product.images;
+        lightboxState.currentIndex = imgIndex;
+        updateLightboxView();
+
+        const lb = document.getElementById('lightbox');
+        lb.classList.remove('hidden');
+        lb.classList.add('flex');
+        void lb.offsetWidth; // 觸發瀏覽器重繪
+        lb.classList.remove('opacity-0');
+        document.body.style.overflow = 'hidden'; // 鎖定背景滾動
+    };
+
+    window.closeLightbox = function() {
+        const lb = document.getElementById('lightbox');
+        lb.classList.add('opacity-0');
+        setTimeout(() => {
+            lb.classList.add('hidden');
+            lb.classList.remove('flex');
+            document.body.style.overflow = ''; 
+        }, 300);
+    };
+
+    window.changeLightboxImage = function(direction) {
+        lightboxState.currentIndex += direction;
+        // 循環播放邏輯
+        if (lightboxState.currentIndex < 0) {
+            lightboxState.currentIndex = lightboxState.images.length - 1;
+        } else if (lightboxState.currentIndex >= lightboxState.images.length) {
+            lightboxState.currentIndex = 0;
+        }
+        updateLightboxView();
+    };
+
+    function updateLightboxView() {
+        const imgEl = document.getElementById('lightbox-img');
+        if (imgEl) {
+            imgEl.src = lightboxState.images[lightboxState.currentIndex];
+        }
+        
+        const indicatorsContainer = document.getElementById('lightbox-indicators');
+        if (indicatorsContainer) {
+            indicatorsContainer.innerHTML = lightboxState.images.map((_, idx) => `
+                <div class="w-2 h-2 rounded-full transition-colors duration-300 ${idx === lightboxState.currentIndex ? 'bg-zera-cream' : 'bg-zera-cream/30'}"></div>
+            `).join('');
+        }
+    }
+
+    // 綁定 Lightbox UI 按鈕事件
+    const lbCloseBtn = document.querySelector('[data-action="close-lightbox"]');
+    const lbPrevBtn = document.querySelector('[data-action="prev-lightbox-image"]');
+    const lbNextBtn = document.querySelector('[data-action="next-lightbox-image"]');
+    const lightboxEl = document.getElementById('lightbox');
+
+    if (lbCloseBtn) lbCloseBtn.addEventListener('click', closeLightbox);
+    if (lbPrevBtn) lbPrevBtn.addEventListener('click', () => changeLightboxImage(-1));
+    if (lbNextBtn) lbNextBtn.addEventListener('click', () => changeLightboxImage(1));
+    
+    // 點擊圖片外部灰色遮罩時關閉
+    if (lightboxEl) {
+        lightboxEl.addEventListener('click', (e) => {
+            if (e.target.id === 'lightbox' || e.target.id === 'lightbox-touch-area') {
+                closeLightbox();
+            }
+        });
+    }
 });

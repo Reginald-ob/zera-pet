@@ -73,9 +73,8 @@
         </div>
     </nav>
 
-    <!-- 手機版選單 (Off-canvas 預留) -->
-    <div id="mobile-menu" class="hidden md:hidden bg-zera-black text-zera-cream p-4 space-y-4 shadow-lg absolute w-full z-40 border-b border-zera-tan/30">
-        <a href="#brand-story" data-action="close-mobile-menu" class="block w-full text-left py-2 border-b border-zera-tan/20">品牌美學</a>
+    <!-- 手機版選單 -->
+    <div id="mobile-menu" class="fixed top-20 left-0 hidden md:hidden bg-zera-black text-zera-cream p-4 space-y-4 shadow-lg w-full z-[100] border-b border-zera-tan/30">        <a href="#brand-story" data-action="close-mobile-menu" class="block w-full text-left py-2 border-b border-zera-tan/20">品牌美學</a>
         <a href="#latest-news" data-action="close-mobile-menu" class="block w-full text-left py-2 border-b border-zera-tan/20">最新消息</a>
         <a href="#product-display" data-action="close-mobile-menu" class="block w-full text-left py-2 border-b border-zera-tan/20">探索系列</a>
         <a href="#bespoke-service" data-action="close-mobile-menu" class="block w-full text-left py-2 border-b border-zera-tan/20">預約配送</a>
@@ -380,49 +379,9 @@
                     <div id="tab-orders" class="member-tab-content block">
                         <h3 class="font-serif text-xl tracking-widest text-zera-black mb-6 border-b border-zera-tan/20 pb-4">ORDER HISTORY</h3>
                         
-                        <div class="space-y-4">
-                            <!-- 單筆訂單卡片 1 -->
-                            <div class="bg-white rounded-2xl border border-zera-tan/10 p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 hover:shadow-md transition-shadow">
-                                <div>
-                                    <div class="flex items-center gap-3 mb-2">
-                                        <span class="font-serif text-sm font-bold tracking-wider">#ZR-20260615-01</span>
-                                        <span class="bg-zera-tan text-zera-cream text-[10px] px-2 py-0.5 rounded-sm tracking-widest">處理中</span>
-                                    </div>
-                                    <p class="text-xs text-zera-black/60 mb-1">2026.06.15 14:30 成立</p>
-                                    <p class="text-sm text-zera-black mt-2">四季通用寵物防水防風機能雨衣... 等 2 件商品</p>
-                                </div>
-                                <div class="w-full md:w-auto flex items-center justify-between md:flex-col md:items-end gap-2 border-t md:border-t-0 border-zera-cream pt-4 md:pt-0">
-                                    <span class="font-serif text-lg">NT$ 2,760</span>
-                                    <button class="text-xs border border-zera-tan text-zera-tan hover:bg-zera-tan hover:text-zera-cream px-4 py-1.5 rounded-full transition-colors">
-                                        查看詳情
-                                    </button>
-                                </div>
-                            </div>
-
-                            <!-- 單筆訂單卡片 2 -->
-                            <div class="bg-white rounded-2xl border border-zera-tan/10 p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 hover:shadow-md transition-shadow">
-                                <div>
-                                    <div class="flex items-center gap-3 mb-2">
-                                        <span class="font-serif text-sm font-bold tracking-wider text-zera-black/70">#ZR-20260520-08</span>
-                                        <span class="bg-zera-cream text-zera-black/50 text-[10px] px-2 py-0.5 rounded-sm tracking-widest">已完成</span>
-                                    </div>
-                                    <p class="text-xs text-zera-black/40 mb-1">2026.05.20 09:15 成立</p>
-                                    <p class="text-sm text-zera-black/70 mt-2">「靜電吸附」拼接式寵物地墊 等 1 件商品</p>
-                                </div>
-                                <div class="w-full md:w-auto flex items-center justify-between md:flex-col md:items-end gap-2 border-t md:border-t-0 border-zera-cream pt-4 md:pt-0">
-                                    <span class="font-serif text-lg text-zera-black/70">NT$ 800</span>
-                                    <button class="text-xs border border-zera-tan/30 text-zera-black/50 hover:border-zera-tan hover:text-zera-tan px-4 py-1.5 rounded-full transition-colors">
-                                        查看詳情
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- 分頁或載入更多 -->
-                        <div class="mt-8 text-center">
-                            <button class="text-xs tracking-widest text-zera-tan border-b border-zera-tan/30 pb-1 hover:border-zera-tan transition-colors">
-                                載入更多訂單 LOAD MORE
-                            </button>
+                        <!-- 動態渲染歷史訂單的容器 -->
+                        <div id="member-orders-container" class="space-y-4">
+                            <p class="text-center py-8 text-zera-black/50 text-sm italic">載入中...</p>
                         </div>
                     </div>
 
@@ -565,6 +524,57 @@
                         </button>
                     </div>
                 </form>
+            </div>
+        </div>
+
+        <!-- 視圖 5: 付款頁面 (初始隱藏) -->
+        <div id="payment-view" class="view-section hidden animate-fade-in">
+            <div class="text-center mb-12">
+                <h2 class="font-serif text-3xl tracking-widest text-zera-black uppercase">Payment</h2>
+                <p class="text-zera-tan font-serif tracking-widest text-sm mt-2">訂單付款</p>
+            </div>
+            
+            <div class="max-w-xl mx-auto bg-white p-8 md:p-12 rounded-3xl border border-zera-tan/20 shadow-sm mt-8 relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-full h-1.5 bg-zera-tan"></div>
+                
+                <div class="space-y-4 mb-10 pb-8 border-b border-zera-tan/10 text-sm">
+                    <div class="flex justify-between text-zera-black/60">
+                        <span class="tracking-widest">訂單編號 Order ID</span>
+                        <span id="payment-order-id" class="font-bold text-zera-black font-serif"></span>
+                    </div>
+                    <div class="flex justify-between items-center pt-2">
+                        <span class="tracking-widest text-zera-black/60">應付金額 Amount</span>
+                        <span id="payment-amount" class="font-serif text-2xl text-zera-tan font-bold"></span>
+                    </div>
+                </div>
+
+                <div class="mb-10">
+                    <label class="block text-xs tracking-widest mb-3 font-serif text-zera-black/70 uppercase">Payment Method / 選擇付款方式</label>
+                    <div class="relative">
+                        <svg class="w-5 h-5 absolute left-3 top-3 text-zera-black/40 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
+                        <select id="payment-method-select" class="w-full bg-zera-cream/20 border border-zera-tan/30 rounded-lg pl-10 pr-4 py-3 text-zera-black focus:outline-none focus:border-zera-tan transition-colors text-sm cursor-pointer appearance-none">
+                            <option value="網銀轉帳" selected>網銀轉帳</option>
+                            <option value="信用卡-一次付清">信用卡-一次付清</option>
+                            <option value="信用卡-國外卡">信用卡-國外卡</option>
+                            <option value="信用卡-銀聯卡">信用卡-銀聯卡</option>
+                            <option value="Apple Pay">Apple Pay</option>
+                            <option value="Google Pay">Google Pay</option>
+                            <option value="ATM 轉帳">ATM 轉帳</option>
+                            <option value="超商代碼">超商代碼</option>
+                            <option value="icash Pay">icash Pay</option>
+                        </select>
+                        <div class="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-zera-black/40">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </div>
+                    </div>
+                </div>
+
+                <button id="process-payment-btn" class="w-full border border-zera-tan bg-zera-tan text-zera-cream hover:bg-transparent hover:text-zera-tan font-serif tracking-widest py-3.5 rounded-full transition-all duration-300 text-sm uppercase text-center block shadow-md">
+                    確認付款 Pay Now
+                </button>
+                <button id="cancel-payment-btn" class="w-full mt-4 text-xs text-zera-black/40 hover:text-red-800 transition-colors underline pt-2 block text-center tracking-widest">
+                    稍後付款 (訂單將保留於會員中心)
+                </button>
             </div>
         </div>
 
