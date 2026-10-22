@@ -1197,29 +1197,80 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // ==========================================
+// ==========================================
     // 8. 訂單付款邏輯 (Payment Gateway)
     // ==========================================
     const processPaymentBtn = document.getElementById('process-payment-btn');
     const cancelPaymentBtn = document.getElementById('cancel-payment-btn');
+    const paymentMethodSelect = document.getElementById('payment-method-select');
+    const bankTransferArea = document.getElementById('bank-transfer-area');
+    const copyBankAccBtn = document.getElementById('copy-bank-acc-btn');
 
+    // A. 付款方式切換邏輯
+    if (paymentMethodSelect && bankTransferArea) {
+        paymentMethodSelect.addEventListener('change', (e) => {
+            if (e.target.value === '網銀轉帳') {
+                bankTransferArea.classList.remove('hidden');
+            } else {
+                bankTransferArea.classList.add('hidden');
+                document.getElementById('bank-last-5').value = ''; // 切換時清空輸入框
+            }
+        });
+    }
+
+    // B. 一鍵複製帳號邏輯
+    if (copyBankAccBtn) {
+        copyBankAccBtn.addEventListener('click', () => {
+            const accText = document.getElementById('bank-account-text').innerText.replace(/-/g, '');
+            navigator.clipboard.writeText(accText).then(() => {
+                const originalText = copyBankAccBtn.innerText;
+                copyBankAccBtn.innerText = '已複製';
+                copyBankAccBtn.classList.add('bg-zera-tan', 'text-white');
+                setTimeout(() => {
+                    copyBankAccBtn.innerText = originalText;
+                    copyBankAccBtn.classList.remove('bg-zera-tan', 'text-white');
+                }, 2000);
+            }).catch(err => {
+                alert('複製失敗，請手動選取複製');
+            });
+        });
+    }
+
+    // C. 確認付款與狀態寫入
     if (processPaymentBtn) {
         processPaymentBtn.addEventListener('click', async () => {
             if (!currentPaymentOrder) return;
+            
+            const method = paymentMethodSelect.value;
+            let last5 = null;
+
+            // 網銀轉帳防呆驗證
+            if (method === '網銀轉帳') {
+                last5 = document.getElementById('bank-last-5').value.trim();
+                if (!last5 || last5.length !== 5 || isNaN(last5)) {
+                    alert('請輸入正確的匯款帳號末 5 碼（需為 5 位數字）');
+                    return;
+                }
+            }
+
             const btn = processPaymentBtn;
             btn.disabled = true;
             btn.textContent = '金流處理中 Processing...';
             btn.classList.add('opacity-70', 'cursor-not-allowed');
 
             try {
-                const method = document.getElementById('payment-method-select').value;
                 // 模擬與金流閘道連線時間
                 await new Promise(resolve => setTimeout(resolve, 1500));
                 
-                // 模擬付款成功，將訂單狀態更新為 '處理中'
+                // 準備要更新的資料 (將狀態改為處理中，並寫入末5碼)
+                const updatePayload = { status: '處理中' };
+                if (method === '網銀轉帳') {
+                    updatePayload.payment_last5 = last5;
+                }
+                
                 const { error } = await supabase
                     .from('orders')
-                    .update({ status: '處理中' })
+                    .update(updatePayload)
                     .eq('order_id', currentPaymentOrder.id);
                 
                 if (error) throw error;
@@ -1248,7 +1299,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 放棄當下結帳，稍後再付
+    // D. 放棄當下結帳，保留為未結帳狀態
     if (cancelPaymentBtn) {
         cancelPaymentBtn.addEventListener('click', async () => {
             alert('訂單已為您保留，您可隨時至會員中心「歷史訂單」中完成結帳手續。');
@@ -1266,11 +1317,12 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 提供給歷史訂單清單按鈕呼叫的函數
+    // 提供給歷史訂單清單按鈕呼叫的函數 (由未結帳按鈕觸發)
     window.resumePayment = function(orderId, amount) {
         currentPaymentOrder = { id: orderId, amount: amount };
         document.getElementById('payment-order-id').textContent = orderId;
         document.getElementById('payment-amount').textContent = `NT$ ${amount.toLocaleString()}`;
+        document.getElementById('bank-last-5').value = ''; // 重置輸入框
         
         document.querySelectorAll('.view-section').forEach(sec => {
             sec.classList.remove('block');
@@ -1283,7 +1335,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
-
+    
     // ==========================================
     // 3. 手機版選單開關控制
     // ==========================================
