@@ -528,7 +528,27 @@
         </div>
 
         <!-- 視圖 5: 付款頁面 (初始隱藏) -->
-        <div class="mb-10">
+        <div id="payment-view" class="view-section hidden animate-fade-in">
+            <div class="text-center mb-12">
+                <h2 class="font-serif text-3xl tracking-widest text-zera-black uppercase">Payment</h2>
+                <p class="text-zera-tan font-serif tracking-widest text-sm mt-2">訂單付款</p>
+            </div>
+            
+            <div class="max-w-xl mx-auto bg-white p-8 md:p-12 rounded-3xl border border-zera-tan/20 shadow-sm mt-8 relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-full h-1.5 bg-zera-tan"></div>
+                
+                <div class="space-y-4 mb-10 pb-8 border-b border-zera-tan/10 text-sm">
+                    <div class="flex justify-between text-zera-black/60">
+                        <span class="tracking-widest">訂單編號 Order ID</span>
+                        <span id="payment-order-id" class="font-bold text-zera-black font-serif"></span>
+                    </div>
+                    <div class="flex justify-between items-center pt-2">
+                        <span class="tracking-widest text-zera-black/60">應付金額 Amount</span>
+                        <span id="payment-amount" class="font-serif text-2xl text-zera-tan font-bold"></span>
+                    </div>
+                </div>
+
+                <div class="mb-10">
                     <label class="block text-xs tracking-widest mb-3 font-serif text-zera-black/70 uppercase">Payment Method / 選擇付款方式</label>
                     <div class="relative">
                         <svg class="w-5 h-5 absolute left-3 top-3 text-zera-black/40 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
