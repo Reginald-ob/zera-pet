@@ -23,6 +23,10 @@
     let currentRenderedItems = []; // 當前畫面上渲染的商品陣列
     let currentPaymentOrder = null; // 紀錄當前正在付款的訂單資訊
 
+    // 顯示與隱藏 Loader 函數
+    window.showLoader = () => document.getElementById('global-loader')?.classList.remove('hidden');
+    window.hideLoader = () => document.getElementById('global-loader')?.classList.add('hidden');
+
     // ==========================================
     // 2. 購物車核心邏輯 (Cart Management)
     // ==========================================
@@ -292,6 +296,9 @@ document.addEventListener('DOMContentLoaded', () => {
             // 將目標視圖強制修改為登入/註冊頁面 (auth-view)
             if (targetId === 'member-view' && !currentUser) {
                 targetId = 'auth-view';
+            } else if (targetId === 'member-view' && currentUser) {
+                showLoader();
+                setTimeout(() => hideLoader(), 600);
             }
 
             // 隱藏所有視圖
@@ -881,6 +888,8 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('商品資料載入失敗:', error);
             // 失敗時的防呆顯示
             document.getElementById('product-grid').innerHTML = `<div class="col-span-full text-center py-12 text-red-800 text-sm">無法載入商品資料，請稍後再試。</div>`;
+        } finally {
+            hideLoader(); // 初始化資料抓取完畢，隱藏 Loader
         }
     }
     if (searchInput) {
@@ -1133,15 +1142,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 alert('您的購物車目前沒有商品，請先去逛逛吧！');
                 return;
             }
-            
-            // 跳轉至物流填寫視圖 (checkout-view)
-            document.querySelectorAll('.view-section').forEach(sec => {
-                sec.classList.remove('block');
-                sec.classList.add('hidden');
-            });
-            document.getElementById('checkout-view').classList.remove('hidden');
-            document.getElementById('checkout-view').classList.add('block');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            showLoader();
+            setTimeout(() => {
+                // 跳轉至物流填寫視圖 (checkout-view)
+                document.querySelectorAll('.view-section').forEach(sec => {
+                    sec.classList.remove('block');
+                    sec.classList.add('hidden');
+                });
+                document.getElementById('checkout-view').classList.remove('hidden');
+                document.getElementById('checkout-view').classList.add('block');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                hideLoader();
+            }, 600);
         });
     }
 
@@ -1259,6 +1272,7 @@ document.addEventListener('DOMContentLoaded', () => {
             submitBtn.textContent = '訂單處理中 Processing...';
             submitBtn.classList.add('opacity-70', 'cursor-not-allowed');
 
+            showLoader();
             try {
                 const itemsAmount = parseInt(cartState.reduce((sum, item) => sum + (item.price * item.quantity), 0));
                 
@@ -1319,6 +1333,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.error('訂單建立失敗:', error);
                 alert(`結帳時發生錯誤：${error.message}`);
             } finally {
+                hideLoader();
                 submitBtn.disabled = false;
                 submitBtn.textContent = '確認送出訂單 Submit Order';
                 submitBtn.classList.remove('opacity-70', 'cursor-not-allowed');
@@ -1387,6 +1402,7 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.textContent = '金流處理中 Processing...';
             btn.classList.add('opacity-70', 'cursor-not-allowed');
 
+            showLoader();
             try {
                 // 模擬與金流閘道連線時間
                 await new Promise(resolve => setTimeout(resolve, 1500));
@@ -1421,6 +1437,7 @@ document.addEventListener('DOMContentLoaded', () => {
             } catch (err) {
                 alert(`付款失敗: ${err.message}`);
             } finally {
+                hideLoader();
                 btn.disabled = false;
                 btn.textContent = '確認付款 Pay Now';
                 btn.classList.remove('opacity-70', 'cursor-not-allowed');
