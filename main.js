@@ -722,59 +722,63 @@ document.addEventListener('DOMContentLoaded', () => {
     const sortSelect = document.getElementById('sortSelect');
 
     function renderProducts() {
-            const grid = document.getElementById('product-grid');
-            // 先依目前選取的分類過濾商品
-            let items = allProducts.filter(product => product.sub_code === state.category);
+        const grid = document.getElementById('product-grid');
+        if (!grid) return;
 
-            if (state.searchQuery) {
-                items = items.filter(p => 
-                    p.name.toLowerCase().includes(state.searchQuery) || 
-                    p.desc.toLowerCase().includes(state.searchQuery)
-                );
-            }
+        // 1. 類別過濾
+        let items = allProducts.filter(product => product.sub_code === state.category);
 
-            if (state.sortOrder === 'price-desc') {
-                items.sort((a, b) => b.price - a.price);
-            } else if (state.sortOrder === 'price-asc') {
-                items.sort((a, b) => a.price - b.price);
-            }
+        // 2. 搜尋過濾
+        if (state.searchQuery) {
+            items = items.filter(p =>
+                p.name.toLowerCase().includes(state.searchQuery) ||
+                (p.desc && p.desc.toLowerCase().includes(state.searchQuery))
+            );
+        }
 
-            currentRenderedItems = items;
+        // 3. 價格排序
+        if (state.sortOrder === 'price-desc') {
+            items.sort((a, b) => b.price - a.price);
+        } else if (state.sortOrder === 'price-asc') {
+            items.sort((a, b) => a.price - b.price);
+        }
 
-            if (items.length === 0) {
-                grid.innerHTML = `<div class="col-span-1 sm:col-span-2 md:col-span-4 text-center py-12 text-zera-black/50 text-sm">${i18nDictionary[currentLang]['no_products_found']}</div>`;
-                return;
-            }
+        currentRenderedItems = items;
 
-            grid.innerHTML = items.map((p, itemIndex) => {
-                const imageSlides = p.images.map((imgUrl, imgIndex) => `
-                    <img src="${imgUrl}" alt="${p.name}" loading="lazy" onclick="openLightbox(${itemIndex}, ${imgIndex})" class="flex-none w-full h-full object-cover snap-center bg-zera-cream/50 cursor-zoom-in hover:opacity-90 transition-opacity" />
-                `).join('');
+        if (items.length === 0) {
+            grid.innerHTML = `<div class="col-span-1 sm:col-span-2 md:col-span-4 text-center py-12 text-zera-black/50 text-sm">${i18nDictionary[currentLang]['no_products_found']}</div>`;
+            return;
+        }
 
-                return `
-                <div class="bg-white p-5 rounded-3xl border border-zera-tan/10 shadow-sm text-zera-black hover:shadow-md transition-shadow flex flex-col items-center">
-                    
-                    <div class="h-48 sm:h-56 w-full rounded-2xl mb-5 overflow-hidden relative group">
-                        <div class="flex overflow-x-auto snap-x snap-mandatory h-full w-full hide-scrollbar">
-                            ${imageSlides}
-                        </div>
-                        <div class="absolute bottom-2 left-0 w-full flex justify-center gap-1.5 pointer-events-none opacity-60">
-                            ${p.images.map(() => `<div class="w-1.5 h-1.5 rounded-full bg-zera-cream shadow-sm border border-zera-black/10"></div>`).join('')}
-                        </div>
+        grid.innerHTML = items.map((p, itemIndex) => {
+            const imageSlides = p.images.map((imgUrl, imgIndex) => `
+                <img src="${imgUrl}" alt="${p.name}" loading="lazy" onclick="openLightbox(${itemIndex}, ${imgIndex})" class="flex-none w-full h-full object-cover snap-center bg-zera-cream/50 cursor-zoom-in hover:opacity-90 transition-opacity" />
+            `).join('');
+
+            return `
+            <div class="bg-white p-5 rounded-3xl border border-zera-tan/10 shadow-sm text-zera-black hover:shadow-md transition-shadow flex flex-col items-center">
+                
+                <div class="h-48 sm:h-56 w-full rounded-2xl mb-5 overflow-hidden relative group">
+                    <div class="flex overflow-x-auto snap-x snap-mandatory h-full w-full hide-scrollbar">
+                        ${imageSlides}
                     </div>
-
-                    <div class="w-full text-left">
-                        <h3 class="text-sm font-bold mb-1 line-clamp-1">${p.name}</h3>
-                        <p class="text-zera-black/60 text-[11px] mb-5 line-clamp-2 leading-relaxed">${p.desc}</p>
-                    </div>
-                    
-                    <div class="mt-auto w-full flex items-center justify-between border-t border-zera-cream pt-4">
-                        <div class="text-zera-tan font-semibold text-sm tracking-wide">NT$ ${p.displayPrice}</div>
-                        <button onclick="openProductModal('${p.id}')" class="bg-[#C6A87C] hover:bg-[#B59567] text-white text-[11px] px-4 py-1.5 rounded-full transition-colors font-medium tracking-wider shadow-sm focus:outline-none">${i18nDictionary[currentLang]['btn_buy_now']}</button>
+                    <div class="absolute bottom-2 left-0 w-full flex justify-center gap-1.5 pointer-events-none opacity-60">
+                        ${p.images.map(() => `<div class="w-1.5 h-1.5 rounded-full bg-zera-cream shadow-sm border border-zera-black/10"></div>`).join('')}
                     </div>
                 </div>
-            `}).join('');
-        }
+
+                <div class="w-full text-left">
+                    <h3 class="text-sm font-bold mb-1 line-clamp-1">${p.name}</h3>
+                    <p class="text-zera-black/60 text-[11px] mb-5 line-clamp-2 leading-relaxed">${p.desc}</p>
+                </div>
+                
+                <div class="mt-auto w-full flex items-center justify-between border-t border-zera-cream pt-4">
+                    <div class="text-zera-tan font-semibold text-sm tracking-wide">NT$ ${p.displayPrice}</div>
+                    <button onclick="openProductModal('${p.id}')" class="bg-[#C6A87C] hover:bg-[#B59567] text-white text-[11px] px-4 py-1.5 rounded-full transition-colors font-medium tracking-wider shadow-sm focus:outline-none">${i18nDictionary[currentLang]['btn_buy_now']}</button>
+                </div>
+            </div>
+        `}).join('');
+    }
 
     // ==========================================
     // 分類選單邏輯
@@ -862,10 +866,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 };
             });
             
-            // 萃取所有不重複的子類別作為分類按鈕
-            availableCategories = [...new Set(allProducts.map(product => product.sub_code))];
+            // 萃取所有不重複的子類別作為分類按鈕，並過濾掉空值
+            availableCategories = [...new Set(allProducts.map(product => product.sub_code).filter(Boolean))];
 
-            // 預設選中第一個分類
+            // 預設選中第一個分類 (例如 OUT)
             if (availableCategories.length > 0 && !state.category) {
                 state.category = availableCategories[0];
             }
@@ -879,8 +883,19 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('product-grid').innerHTML = `<div class="col-span-full text-center py-12 text-red-800 text-sm">無法載入商品資料，請稍後再試。</div>`;
         }
     }
-    if (searchInput) searchInput.addEventListener('input', renderProducts);
-    if (sortSelect) sortSelect.addEventListener('change', renderProducts);
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            state.searchQuery = e.target.value.toLowerCase().trim();
+            renderProducts();
+        });
+    }
+
+    if (sortSelect) {
+        sortSelect.addEventListener('change', (e) => {
+            state.sortOrder = e.target.value;
+            renderProducts();
+        });
+    }
     fetchProductsData();
 
     // ==========================================
