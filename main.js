@@ -22,6 +22,7 @@
     let availableCategories = []; // 存放所有可用的分類
     let currentRenderedItems = []; // 當前畫面上渲染的商品陣列
     let currentPaymentOrder = null; // 紀錄當前正在付款的訂單資訊
+    let currentOrdersData = []; // 存放會員當前所有歷史訂單資料
 
     // 顯示與隱藏 Loader 函數
     window.showLoader = () => document.getElementById('global-loader')?.classList.remove('hidden');
@@ -605,6 +606,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 if (ordersError) console.warn('讀取訂單發生權限錯誤:', ordersError.message);
 
+                currentOrdersData = ordersData || [];
+
                 let dogSpent = 0;
                 let catSpent = 0;
 
@@ -649,8 +652,9 @@ document.addEventListener('DOMContentLoaded', () => {
                                     <div class="w-full md:w-auto flex flex-row md:flex-col items-center justify-between md:items-end gap-3 border-t md:border-t-0 border-zera-cream pt-4 md:pt-0 shrink-0">
                                         <span class="font-serif text-lg ${isUnpaid ? 'text-red-800' : 'text-zera-black/80'}">NT$ ${order.items_amount.toLocaleString()}</span>
                                         ${isUnpaid
-                                            ? `<button onclick="window.resumePayment('${order.order_id}',${order.items_amount})" class="text-xs border border-red-800 bg-red-800 text-white hover:bg-white hover:text-red-800 px-6 py-2 rounded-full transition-colors font-bold tracking-widest shadow-sm">前往結帳</button>`
-                                            : `<button class="text-xs border border-zera-tan/40 text-zera-black/60 hover:bg-zera-tan hover:text-zera-cream px-5 py-1.5 rounded-full transition-colors tracking-widest">查看詳情</button>`
+                                            ? `<button onclick="window.resumePayment('${order.order_id}', ${order.items_amount})" class="text-xs border border-red-800 bg-red-800 text-white hover:bg-white hover:text-red-800 px-6 py-2 rounded-full transition-colors font-bold tracking-widest shadow-sm">前往結帳</button>
+                                               <button onclick="window.openOrderDetails('${order.order_id}')" class="text-[10px] text-zera-black/50 hover:text-zera-black underline tracking-widest mt-1">查看詳情</button>`
+                                            : `<button onclick="window.openOrderDetails('${order.order_id}')" class="text-xs border border-zera-tan/40 text-zera-black/60 hover:bg-zera-tan hover:text-zera-cream px-5 py-1.5 rounded-full transition-colors tracking-widest">查看詳情</button>`
                                         }
                                     </div>
                                 </div>
@@ -1481,6 +1485,70 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
+
+    const orderDetailsModal = document.getElementById('order-details-modal');
+    const orderDetailsContent = document.getElementById('order-details-content');
+    const closeOrderDetailsButton = document.querySelector('[data-action="close-order-details"]');
+
+    window.openOrderDetails = function(orderId) {
+        const order = currentOrdersData.find(item => item.order_id === orderId);
+        if (!order) {
+            console.warn('找不到訂單明細:', orderId);
+            return;
+        }
+
+        const items = typeof order.items === 'string' ? JSON.parse(order.items) : order.items;
+        const itemsContainer = document.getElementById('modal-detail-items');
+        const date = new Date(order.created_at);
+        const dateText = isNaN(date)
+            ? ''
+            : `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, '0')}.${String(date.getDate()).padStart(2, '0')} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+        const itemsAmount = Number(order.items_amount) || 0;
+        const shippingFee = Number(order.shipping_fee) || 0;
+
+        document.getElementById('modal-detail-id').textContent = `Order ID: ${order.order_id}`;
+        document.getElementById('modal-detail-date').textContent = `Date: ${dateText}`;
+        document.getElementById('modal-detail-status').textContent = `Status: ${order.status}`;
+        document.getElementById('modal-detail-subtotal').textContent = `NT$ ${itemsAmount.toLocaleString()}`;
+        document.getElementById('modal-detail-total').textContent = `NT$ ${(itemsAmount + shippingFee).toLocaleString()}`;
+        itemsContainer.replaceChildren(...items.map(item => {
+            const row = document.createElement('div');
+            row.className = 'flex justify-between gap-3 text-[11px] text-black';
+
+            const description = document.createElement('span');
+            description.textContent = `${item.name} × ${item.quantity}`;
+
+            const amount = document.createElement('span');
+            amount.className = 'shrink-0';
+            amount.textContent = `NT$ ${((Number(item.price) || 0) * (Number(item.quantity) || 0)).toLocaleString()}`;
+
+            row.append(description, amount);
+            return row;
+        }));
+
+        orderDetailsModal.classList.remove('hidden');
+        requestAnimationFrame(() => {
+            orderDetailsModal.classList.remove('opacity-0');
+            orderDetailsContent.classList.remove('scale-95');
+            orderDetailsContent.classList.add('scale-100');
+        });
+    };
+
+    const closeOrderDetails = () => {
+        orderDetailsModal.classList.add('opacity-0');
+        orderDetailsContent.classList.remove('scale-100');
+        orderDetailsContent.classList.add('scale-95');
+        window.setTimeout(() => orderDetailsModal.classList.add('hidden'), 300);
+    };
+
+    if (closeOrderDetailsButton) {
+        closeOrderDetailsButton.addEventListener('click', closeOrderDetails);
+    }
+    if (orderDetailsModal) {
+        orderDetailsModal.addEventListener('click', event => {
+            if (event.target === orderDetailsModal) closeOrderDetails();
+        });
+    }
     
     // ==========================================
     // 3. 手機版選單開關控制
@@ -1610,3 +1678,116 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
+    // ==========================================
+    // 9. 訂單詳情卡片 (Order Details Modal) 邏輯
+    // ==========================================
+    let activeDetailOrderId = null;
+
+    window.openOrderDetails = function(orderId) {
+        const order = currentOrdersData.find(o => o.order_id === orderId);
+        if (!order) return;
+
+        activeDetailOrderId = orderId;
+        
+        // 填入基本資訊
+        const dateObj = new Date(order.created_at);
+        document.getElementById('modal-detail-id').textContent = `Order ID: ${order.order_id}`;
+        document.getElementById('modal-detail-date').textContent = `Date: ${dateObj.getFullYear()}/${dateObj.getMonth()+1}/${dateObj.getDate()} ${dateObj.getHours()}:${String(dateObj.getMinutes()).padStart(2,'0')}`;
+        
+        // 判斷付款與訂單狀態
+        let statusText = order.status;
+        if (order.status === '未結帳') statusText += ' (Pending Payment)';
+        if (order.status === '處理中') statusText += ' (Paid & Processing)';
+        if (order.status === '已取消') statusText += ' (Cancelled)';
+        document.getElementById('modal-detail-status').innerHTML = `Status: <span class="${order.status==='未結帳'?'text-red-600':''}">${statusText}</span>`;
+
+        // 渲染商品細項
+        const items = typeof order.items === 'string' ? JSON.parse(order.items) : order.items;
+        const itemsContainer = document.getElementById('modal-detail-items');
+        itemsContainer.innerHTML = items.map(item => `
+            <div class="flex justify-between items-center text-[11px] font-bold text-black border-b border-[rgba(16,86,82,0.1)] pb-1">
+                <span class="truncate pr-2">${item.name} <span class="text-black/50 font-normal">x${item.quantity}</span></span>
+                <span class="shrink-0">NT$${(item.price * item.quantity).toLocaleString()}</span>
+            </div>
+        `).join('');
+
+        // 金額總計
+        const amountStr = `NT$${Number(order.items_amount).toLocaleString()}`;
+        document.getElementById('modal-detail-subtotal').textContent = amountStr;
+        document.getElementById('modal-detail-total').textContent = amountStr;
+
+        // 隱藏/顯示取消訂單按鈕 (已取消或已出貨不可取消)
+        const cancelBtn = document.getElementById('modal-cancel-btn');
+        if (order.status === '已取消' || order.status === '已完成') {
+            cancelBtn.classList.add('hidden');
+        } else {
+            cancelBtn.classList.remove('hidden');
+        }
+
+        // 開啟 Modal 動畫
+        const modal = document.getElementById('order-details-modal');
+        const content = document.getElementById('order-details-content');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        void modal.offsetWidth;
+        modal.classList.remove('opacity-0');
+        content.classList.remove('scale-95');
+        content.classList.add('scale-100');
+        document.body.style.overflow = 'hidden';
+    };
+
+    window.closeOrderDetails = function() {
+        const modal = document.getElementById('order-details-modal');
+        const content = document.getElementById('order-details-content');
+        modal.classList.add('opacity-0');
+        content.classList.remove('scale-100');
+        content.classList.add('scale-95');
+        setTimeout(() => {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            document.body.style.overflow = '';
+        }, 300);
+    };
+
+    // 綁定關閉按鈕
+    const closeDetailBtn = document.querySelector('[data-action="close-order-details"]');
+    if (closeDetailBtn) closeDetailBtn.addEventListener('click', closeOrderDetails);
+    
+    // 綁定背景點擊關閉
+    const orderModalEl = document.getElementById('order-details-modal');
+    if (orderModalEl) {
+        orderModalEl.addEventListener('click', (e) => {
+            if (e.target === orderModalEl) closeOrderDetails();
+        });
+    }
+
+    // 綁定取消訂單按鈕
+    const cancelOrderBtn = document.getElementById('modal-cancel-btn');
+    if (cancelOrderBtn) {
+        cancelOrderBtn.addEventListener('click', async () => {
+            if (!activeDetailOrderId) return;
+            if (!confirm(`確定要取消訂單 #${activeDetailOrderId} 嗎？此操作無法還原。`)) return;
+
+            cancelOrderBtn.textContent = '處理中...';
+            try {
+                const { error } = await supabase
+                    .from('orders')
+                    .update({ status: '已取消' })
+                    .eq('order_id', activeDetailOrderId);
+                
+                if (error) throw error;
+                alert('訂單已成功取消。');
+                
+                closeOrderDetails();
+                // 刷新會員中心資料
+                if (currentUser) {
+                    await fetchAndRenderMemberData(currentUser.id, currentUser.email);
+                }
+            } catch (err) {
+                alert(`取消失敗: ${err.message}`);
+            } finally {
+                cancelOrderBtn.textContent = '取消訂單 Cancel';
+            }
+        });
+    }

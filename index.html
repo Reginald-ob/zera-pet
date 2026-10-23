@@ -713,5 +713,68 @@
             </button>
         </div>
     </div>
+
+    <!-- 訂單詳情 Modal (Order Details Card) -->
+    <div id="order-details-modal" class="fixed inset-0 z-[140] bg-zera-black/60 backdrop-blur-sm hidden grid place-items-center p-4 opacity-0 transition-opacity duration-300">
+        <!-- Card Container -->
+        <div class="w-[400px] max-w-[90%] bg-[rgb(255,250,235)] shadow-[0_187px_75px_rgba(0,0,0,0.01),0_105px_63px_rgba(0,0,0,0.05),0_47px_47px_rgba(0,0,0,0.09),0_12px_26px_rgba(0,0,0,0.1)] rounded-[19px] overflow-hidden transform scale-95 transition-transform duration-300 flex flex-col" id="order-details-content">
+            
+            <!-- Title -->
+            <div class="w-full h-[40px] relative flex items-center pl-5 border-b border-[rgba(16,86,82,0.75)]">
+                <label class="font-bold text-[11px] text-black tracking-widest uppercase">ORDER DETAILS / 訂單明細</label>
+            </div>
+            
+            <!-- Steps / Content -->
+            <div class="flex flex-col p-5 gap-4 max-h-[60vh] overflow-y-auto hide-scrollbar">
+                
+                <!-- Information -->
+                <div class="grid gap-2.5">
+                    <span class="text-[13px] font-bold text-black mb-1">INFORMATION</span>
+                    <p class="text-[11px] font-bold text-black" id="modal-detail-id">Order ID: </p>
+                    <p class="text-[11px] font-bold text-black" id="modal-detail-date">Date: </p>
+                </div>
+                <hr class="h-px bg-[rgba(16,86,82,0.75)] border-none my-1">
+                
+                <!-- Items -->
+                <div class="grid gap-2.5">
+                    <span class="text-[13px] font-bold text-black mb-1">ITEMS</span>
+                    <div id="modal-detail-items" class="space-y-2">
+                        <!-- 動態商品列表將渲染於此 -->
+                    </div>
+                </div>
+                <hr class="h-px bg-[rgba(16,86,82,0.75)] border-none my-1">
+                
+                <!-- Payment Status -->
+                <div class="grid gap-2.5">
+                    <span class="text-[13px] font-bold text-black mb-1">PAYMENT & STATUS</span>
+                    <p class="text-[11px] font-bold text-black" id="modal-detail-status">Status: </p>
+                </div>
+                <hr class="h-px bg-[rgba(16,86,82,0.75)] border-none my-1">
+                
+                <!-- Subtotal / Details -->
+                <div class="grid grid-cols-[10fr_1fr] gap-1.5 mt-1">
+                    <span class="text-[12px] font-bold text-black my-auto mr-auto">Items Subtotal:</span>
+                    <span class="text-[13px] font-bold text-black my-auto ml-auto" id="modal-detail-subtotal">NT$0</span>
+                    <span class="text-[12px] font-bold text-black my-auto mr-auto">Shipping:</span>
+                    <span class="text-[13px] font-bold text-black my-auto ml-auto text-right">NT$0</span>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="flex items-center justify-between p-[10px_10px_10px_20px] bg-[rgba(16,86,82,0.5)]">
+                <!-- 取消訂單小字按鈕 -->
+                <button id="modal-cancel-btn" class="text-[11px] text-black/50 hover:text-red-800 transition-colors underline font-bold tracking-wider">
+                    取消訂單 Cancel
+                </button>
+                <div class="flex items-center gap-4">
+                    <label class="relative text-[22px] text-[#2B2B2F] font-black" id="modal-detail-total">NT$0</label>
+                    <button data-action="close-order-details" class="flex justify-center items-center w-[120px] h-[36px] bg-[rgba(16,86,82,0.55)] shadow-[0_0.5px_0.5px_rgba(16,86,82,0.75),0_1px_0.5px_rgba(16,86,82,0.75)] rounded-[7px] border border-[rgb(16,86,82)] text-black text-[13px] font-bold hover:bg-[rgba(16,86,82,0.7)] transition-all duration-300">
+                        Close
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
 </body>
 </html>
