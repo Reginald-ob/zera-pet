@@ -56,6 +56,10 @@
             </div>
             
             <div class="hidden md:flex items-center gap-4">
+                <select id="lang-switch" class="bg-transparent text-sm border border-zera-tan/30 rounded-full px-3 py-1 text-zera-cream focus:outline-none cursor-pointer">
+                    <option value="zh-TW" class="text-black">中文</option>
+                    <option value="en-US" class="text-black">EN</option>
+                </select>
                 <button data-view-target="member-view" class="text-sm border border-zera-tan/50 px-5 py-2 rounded-full hover:bg-zera-tan transition">會員中心</button>
                 <button data-view-target="cart-view" class="inline-block p-2 border border-zera-tan/50 rounded-full hover:bg-zera-tan transition relative">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
@@ -65,11 +69,11 @@
             </div>
         </div>
         <div class="hidden md:flex justify-center gap-12 py-3 bg-zera-charcoal text-xs uppercase tracking-widest border-t border-zera-tan/20 text-zera-cream/80">
-            <a href="#brand-story" class="hover:text-zera-tan transition">品牌美學</a>
-            <a href="#latest-news" class="hover:text-zera-tan transition">最新消息</a>
-            <a href="#product-display" class="hover:text-zera-tan transition">探索系列</a>
-            <a href="#bespoke-service" class="hover:text-zera-tan transition">大型商品預約配送</a>
-            <a href="#contact-us" class="hover:text-zera-tan transition">聯絡我們</a>
+            <a href="#brand-story" data-i18n="nav_brand" class="hover:text-zera-tan transition">品牌美學</a>
+            <a href="#latest-news" data-i18n="nav_news" class="hover:text-zera-tan transition">最新消息</a>
+            <a href="#product-display" data-i18n="nav_products" class="hover:text-zera-tan transition">探索系列</a>
+            <a href="#bespoke-service" data-i18n="nav_delivery" class="hover:text-zera-tan transition">大型商品預約配送</a>
+            <a href="#contact-us" data-i18n="nav_contact" class="hover:text-zera-tan transition">聯絡我們</a>
         </div>
     </nav>
 
@@ -88,8 +92,8 @@
         <div id="home-view" class="view-section block">
             <section id="brand-story" class="mb-20 grid md:grid-cols-2 gap-12 items-center scroll-mt-24">
                 <div class="space-y-6">
-                    <h2 class="font-serif text-4xl sm:text-5xl leading-tight">為您的高貴夥伴<br><span class="text-zera-tan">打造極致生活</span></h2>
-                    <p class="text-zera-black/70 text-lg italic">ZERA 融匯杜賓之堅毅與邊牧之靈動，以極致美學，為您的摯愛寫下溫潤生活的篇章。</p>
+                    <h2 data-i18n="hero_title" class="font-serif text-4xl sm:text-5xl leading-tight">為您的高貴夥伴<br><span class="text-zera-tan">打造極致生活</span></h2>
+                    <p data-i18n="hero_desc" class="text-zera-black/70 text-lg italic">ZERA 融匯杜賓之堅毅與邊牧之靈動，以極致美學，為您的摯愛寫下溫潤生活的篇章。</p>
                 </div>
                 <div class="grid grid-cols-2 gap-4">
                     <!-- 套用 PRD 規範：aspect-square (1/1) 與 object-contain -->
@@ -103,44 +107,39 @@
             </section>
 
             <section id="latest-news" class="mb-20 border-t border-zera-tan/20 pt-12 scroll-mt-24">
-                <h3 class="font-serif text-2xl tracking-widest text-center mb-8">LATEST NEWS / 最新消息</h3>
+                <h3 data-i18n="section_news_title" class="font-serif text-2xl tracking-widest text-center mb-8">LATEST NEWS / 最新消息</h3>
                 <div class="grid md:grid-cols-3 gap-6">
-                    <!-- 最新消息內容維持不變 -->
                     <div class="bg-white p-6 rounded-2xl border border-zera-tan/10 shadow-sm">
                         <span class="text-xs text-zera-tan font-serif tracking-wider block mb-2">2026.06.09</span>
-                        <h4 class="font-bold text-sm mb-2">四季通用機能外出系列全新上市</h4>
-                        <p class="text-xs text-zera-black/60 leading-relaxed">專為四季設計的防風防暴雨寵物雨衣，使用科技防水複合布料及塗層，現已開放預訂。</p>
+                        <h4 data-i18n="news_1_title" class="font-bold text-sm mb-2">四季通用機能外出系列全新上市</h4>
+                        <p data-i18n="news_1_desc" class="text-xs text-zera-black/60 leading-relaxed">專為四季設計的防風防暴雨寵物雨衣，使用科技防水複合布料及塗層，現已開放預訂。</p>
                     </div>
                     <div class="bg-white p-6 rounded-2xl border border-zera-tan/10 shadow-sm">
                         <span class="text-xs text-zera-tan font-serif tracking-wider block mb-2">2026.06.08</span>
-                        <h4 class="font-bold text-sm mb-2">ZERA會籍權益全面升級公告</h4>
-                        <p class="text-xs text-zera-black/60 leading-relaxed">即日起，所有會員將享有超商取貨『無條件免運』優惠。待會員系統全面上線，過去累積的消費紀錄，對應的會員福利回饋均會無損延續。</p>
+                        <h4 data-i18n="news_2_title" class="font-bold text-sm mb-2">ZERA會籍權益全面升級公告</h4>
+                        <p data-i18n="news_2_desc" class="text-xs text-zera-black/60 leading-relaxed">即日起，所有會員將享有超商取貨『無條件免運』優惠。待會員系統全面上線，過去累積的消費紀錄，對應的會員福利回饋均會無損延續。</p>
                     </div>
                     <div class="bg-white p-6 rounded-2xl border border-zera-tan/10 shadow-sm">
                         <span class="text-xs text-zera-tan font-serif tracking-wider block mb-2">2026.05.20</span>
-                        <h4 class="font-bold text-sm mb-2">ZERA 品牌寵物用品預訂網站上線</h4>
-                        <p class="text-xs text-zera-black/60 leading-relaxed">結合各大品管優良工廠，產品經過多次質量實測。僅接受預訂訂單，需等待10~15日。</p>
+                        <h4 data-i18n="news_3_title" class="font-bold text-sm mb-2">ZERA 品牌寵物用品預訂網站上線</h4>
+                        <p data-i18n="news_3_desc" class="text-xs text-zera-black/60 leading-relaxed">結合各大品管優良工廠，產品經過多次質量實測。僅接受預訂訂單，需等待10~15日。</p>
                     </div>
                 </div>
             </section>
 
             <section id="product-display" class="py-10 border-t border-zera-tan/20 scroll-mt-24">
-                <h2 class="font-serif text-2xl sm:text-3xl mb-8 text-zera-black tracking-widest uppercase text-center">探索精品系列</h2>
-
-                <div id="category-buttons-container" class="flex flex-wrap justify-center gap-2 sm:gap-3 mb-8">
-                    <!-- 由 main.js 動態渲染 -->
-                </div>
+                <h2 data-i18n="section_products_title" class="font-serif text-2xl sm:text-3xl mb-8 text-zera-black tracking-widest uppercase text-center">探索精品系列</h2>
 
                 <div class="flex flex-col sm:flex-row justify-between items-center gap-4 mb-8 bg-white p-4 rounded-2xl border border-zera-tan/20 shadow-sm">
                     <div class="w-full sm:w-1/2 relative">
-                        <svg class="w-5 h-5 absolute left-3 top-2.5 text-zera-black/40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                        <input type="text" id="searchInput" placeholder="搜尋當前分類產品名稱或描述..." class="w-full bg-zera-cream/30 border border-zera-tan/30 text-zera-black rounded-full pl-10 pr-4 py-2 text-sm focus:outline-none focus:border-zera-tan transition">
+                        <!-- 注意這裡我們也幫 input 加上了 id 與 data-i18n-placeholder 方便 JS 辨識 -->
+                        <input type="text" id="searchInput" data-i18n-placeholder="search_placeholder" placeholder="搜尋當前分類產品名稱或描述..." class="w-full bg-zera-cream/30 border border-zera-tan/30 text-zera-black rounded-full pl-10 pr-4 py-2 text-sm focus:outline-none focus:border-zera-tan transition">
                     </div>
                     <div class="w-full sm:w-auto">
                         <select id="sortSelect" class="w-full sm:w-auto bg-zera-cream/30 border border-zera-tan/30 text-zera-black rounded-full px-4 py-2 text-sm focus:outline-none focus:border-zera-tan transition cursor-pointer appearance-none">
-                            <option value="default">預設順序</option>
-                            <option value="price-desc">價格：由高至低</option>
-                            <option value="price-asc">價格：由低至高</option>
+                            <option value="default" data-i18n="sort_default">預設順序</option>
+                            <option value="price-desc" data-i18n="sort_price_desc">價格：由高至低</option>
+                            <option value="price-asc" data-i18n="sort_price_asc">價格：由低至高</option>
                         </select>
                     </div>
                 </div>
@@ -152,13 +151,13 @@
             </section>
 
             <section id="bespoke-service" class="mb-20 border-t border-zera-tan/20 pt-12 scroll-mt-24 text-center max-w-2xl mx-auto space-y-6">
-                <h3 class="font-serif text-2xl tracking-widest">大型商品配送 / 預約服務</h3>
-                <p class="text-sm text-zera-black/70 leading-relaxed italic">
+                <h3 data-i18n="section_bespoke_title" class="font-serif text-2xl tracking-widest">大型商品配送 / 預約服務</h3>
+                <p data-i18n="bespoke_desc" class="text-sm text-zera-black/70 leading-relaxed italic">
                     【大型特殊商品包裹】<br>
                     ZERA 提供之部分商品，因體積重量超出一般快遞限制，或商品性質須經由冷鏈運輸、裝釘木架加強包裝等特殊服務，請聯繫客服為您安排專屬物流，為您爭取最划算運費。
                 </p>
                 <div>
-                    <a href="https://line.me/R/ti/p/@117erntk" target="_blank" class="inline-block font-serif text-xs tracking-widest border border-zera-tan bg-zera-tan text-zera-cream px-8 py-3 rounded-full hover:bg-transparent hover:text-zera-tan transition">前往諮詢預約</a>
+                    <a href="https://line.me/R/ti/p/@117erntk" target="_blank" data-i18n="btn_bespoke_reserve" class="inline-block font-serif text-xs tracking-widest border border-zera-tan bg-zera-tan text-zera-cream px-8 py-3 rounded-full hover:bg-transparent hover:text-zera-tan transition">前往諮詢預約</a>
                 </div>
             </section>
         </div>
@@ -445,7 +444,7 @@
                             <span id="cart-total" class="font-serif text-2xl text-zera-tan">NT$ 0</span>
                         </div>
 
-                        <button id="checkout-btn" class="w-full border border-zera-tan bg-zera-tan text-zera-cream hover:bg-transparent hover:text-zera-tan font-serif tracking-widest py-3.5 rounded-full transition-all duration-300 text-xs uppercase text-center block">
+                        <button id="checkout-btn" data-i18n="btn_checkout" class="w-full border border-zera-tan bg-zera-tan text-zera-cream hover:bg-transparent hover:text-zera-tan font-serif tracking-widest py-3.5 rounded-full transition-all duration-300 text-xs uppercase text-center block">
                             前往結帳 Checkout
                         </button>
                     </div>
@@ -604,17 +603,17 @@
     <footer id="contact-us" class="bg-zera-tan text-zera-cream py-16 sm:py-24 scroll-mt-24">
         <div class="max-w-4xl mx-auto px-8 grid md:grid-cols-2 gap-12 sm:gap-16">
             <div class="space-y-6">
-                <h3 class="font-serif text-2xl sm:text-3xl">關於 ZERA</h3>
-                <p class="leading-relaxed text-sm opacity-90 italic">
+                <h3 data-i18n="footer_about_title" class="font-serif text-2xl sm:text-3xl">關於 ZERA</h3>
+                <p data-i18n="footer_about_desc" class="leading-relaxed text-sm opacity-90 italic">
                     ZERA 之名，源於杜賓 Zeus 與邊牧 Vira 的靈魂共鳴。我們創立之初衷，乃是渴望將精緻細膩的照護哲學，化作平實優雅的可能，讓摯愛伴侶在每一刻陪伴中，皆能享有頂級生活之品質與尊榮。
                 </p>
             </div>
             <div class="space-y-4">
-                <h3 class="font-serif text-2xl sm:text-3xl">聯絡我們</h3>
+                <h3 data-i18n="footer_contact_title" class="font-serif text-2xl sm:text-3xl">聯絡我們</h3>
                 <div class="text-sm space-y-2 opacity-90">
-                    <p>服務時間：週一至週五 8:00 - 18:00</p>
-                    <p>平日若遇國定假日或公休則彈性回覆</p>
-                    <a href="https://line.me/R/ti/p/@117erntk">官方 LINE: @117erntk</a>
+                    <p data-i18n="footer_service_hours">服務時間：週一至週五 8:00 - 18:00</p>
+                    <p data-i18n="footer_service_note">平日若遇國定假日或公休則彈性回覆</p>
+                    <a href="https://line.me/R/ti/p/@117erntk" data-i18n="footer_line">官方 LINE: @117erntk</a>
                 </div>
             </div>
         </div>

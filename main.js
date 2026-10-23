@@ -136,7 +136,121 @@
     }
 
 document.addEventListener('DOMContentLoaded', () => {
-    
+// ==========================================
+    // 0. 多國語言字典 (i18n Dictionary) 與 切換邏輯
+    // ==========================================
+    const i18nDictionary = {
+        'zh-TW': {
+            'nav_member': '會員中心',
+            'nav_brand': '品牌美學',
+            'nav_news': '最新消息',
+            'nav_products': '探索系列',
+            'nav_delivery': '大型商品預約配送',
+            'nav_contact': '聯絡我們',
+            'hero_title': '為您的高貴夥伴<br><span class="text-zera-tan">打造極致生活</span>',
+            'hero_desc': 'ZERA 融匯杜賓之堅毅與邊牧之靈動，以極致美學，為您的摯愛寫下溫潤生活的篇章。',
+            'btn_checkout': '前往結帳 Checkout',
+            'section_news_title': 'LATEST NEWS / 最新消息',
+            'news_1_title': '四季通用機能外出系列全新上市',
+            'news_1_desc': '專為四季設計的防風防暴雨寵物雨衣，使用科技防水複合布料及塗層，現已開放預訂。',
+            'news_2_title': 'ZERA會籍權益全面升級公告',
+            'news_2_desc': '即日起，所有會員將享有超商取貨『無條件免運』優惠。待會員系統全面上線，過去累積的消費紀錄，對應的會員福利回饋均會無損延續。',
+            'news_3_title': 'ZERA 品牌寵物用品預訂網站上線',
+            'news_3_desc': '結合各大品管優良工廠，產品經過多次質量實測。僅接受預訂訂單，需等待10~15日。',
+            'section_products_title': '探索精品系列',
+            'search_placeholder': '搜尋當前分類產品名稱或描述...',
+            'sort_default': '預設順序',
+            'sort_price_desc': '價格：由高至低',
+            'sort_price_asc': '價格：由低至高',
+            'no_products_found': '沒有找到符合當前條件的精品。',
+            'btn_buy_now': '立即購買',
+            'btn_add_to_cart': '加入購物車 Add to Cart',
+            'modal_quantity': 'Quantity',
+            'section_bespoke_title': '大型商品配送 / 預約服務',
+            'bespoke_desc': '【大型特殊商品包裹】<br>ZERA 提供之部分商品，因體積重量超出一般快遞限制，或商品性質須經由冷鏈運輸、裝釘木架加強包裝等特殊服務，請聯繫客服為您安排專屬物流，為您爭取最划算運費。',
+            'btn_bespoke_reserve': '前往諮詢預約',
+            'footer_about_title': '關於 ZERA',
+            'footer_about_desc': 'ZERA 之名，源於杜賓 Zeus 與邊牧 Vira 的靈魂共鳴。我們創立之初衷，乃是渴望將精緻細膩的照護哲學，化作平實優雅的可能，讓摯愛伴侶在每一刻陪伴中，皆能享有頂級生活之品質與尊榮。',
+            'footer_contact_title': '聯絡我們',
+            'footer_service_hours': '服務時間：週一至週五 8:00 - 18:00',
+            'footer_service_note': '平日若遇國定假日或公休則彈性回覆',
+            'footer_line': '官方 LINE: @117erntk'
+        },
+        'en-US': {
+            'nav_member': 'Member Center',
+            'nav_brand': 'Brand Story',
+            'nav_news': 'Latest News',
+            'nav_products': 'Collections',
+            'nav_delivery': 'Bespoke Delivery',
+            'nav_contact': 'Contact Us',
+            'hero_title': 'For Your Noble Companion<br><span class="text-zera-tan">The Ultimate Lifestyle</span>',
+            'hero_desc': 'ZERA blends the resilience of a Doberman with the agility of a Border Collie, writing a chapter of elegant living for your beloved with ultimate aesthetics.',
+            'btn_checkout': 'Proceed to Checkout',
+            'section_news_title': 'LATEST NEWS',
+            'news_1_title': 'All-Season Functional Outdoor Collection Now Available',
+            'news_1_desc': 'Windproof and stormproof pet raincoats designed for all seasons, featuring high-tech waterproof composite fabrics and coatings. Now open for pre-order.',
+            'news_2_title': 'ZERA Membership Benefits Upgrade Announcement',
+            'news_2_desc': 'Effective immediately, all members enjoy unconditional free shipping for convenience store pickup. Once the membership system is fully launched, all past spending records and corresponding benefits will carry over seamlessly.',
+            'news_3_title': 'ZERA Premium Pet Supplies Pre-Order Website is Live',
+            'news_3_desc': 'Partnering with top-tier quality-controlled factories, our products undergo rigorous testing. Pre-orders only; estimated wait time is 10-15 days.',
+            'section_products_title': 'EXPLORE PREMIUM COLLECTIONS',
+            'search_placeholder': 'Search product names or descriptions...',
+            'sort_default': 'Default Sorting',
+            'sort_price_desc': 'Price: High to Low',
+            'sort_price_asc': 'Price: Low to High',
+            'no_products_found': 'No premium products found matching the current criteria.',
+            'btn_buy_now': 'Buy Now',
+            'btn_add_to_cart': 'Add to Cart',
+            'modal_quantity': 'Quantity',
+            'section_bespoke_title': 'Bespoke Delivery / Reservation Service',
+            'bespoke_desc': '[Large/Special Parcels]<br>Due to size, weight, or special requirements (e.g., cold chain transit, wooden crating), certain ZERA products exceed standard shipping limits. Please contact customer service to arrange specialized logistics and secure the best shipping rates.',
+            'btn_bespoke_reserve': 'Contact to Reserve',
+            'footer_about_title': 'About ZERA',
+            'footer_about_desc': 'The name ZERA originates from the soul resonance between Zeus the Doberman and Vira the Border Collie. Our founding mission is to transform the philosophy of exquisite and meticulous care into an elegant reality, ensuring your beloved companions enjoy top-tier quality and prestige in every moment shared.',
+            'footer_contact_title': 'Contact Us',
+            'footer_service_hours': 'Service Hours: Mon - Fri 8:00 AM - 6:00 PM',
+            'footer_service_note': 'Flexible responses during national holidays or non-working days.',
+            'footer_line': 'Official LINE: @117erntk'
+        }
+    };
+
+    let currentLang = localStorage.getItem('zera_lang') || 'zh-TW';
+
+    window.switchLanguage = function(lang, isInitialLoad = false) {
+        currentLang = lang;
+        localStorage.setItem('zera_lang', lang);
+        
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+            const key = el.getAttribute('data-i18n');
+            if (i18nDictionary[lang] && i18nDictionary[lang][key]) {
+                el.innerHTML = i18nDictionary[lang][key]; 
+            }
+        });
+
+        document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+            const key = el.getAttribute('data-i18n-placeholder');
+            if (i18nDictionary[lang] && i18nDictionary[lang][key]) {
+                el.placeholder = i18nDictionary[lang][key];
+            }
+        });
+
+        // 防呆機制：如果是初次載入，不強制重繪產品列表 (交給 Google Sheets API 自己接手)
+        if (!isInitialLoad && typeof renderProducts === 'function') {
+            renderProducts();
+        }
+    };
+
+    const langSelect = document.getElementById('lang-switch');
+    if (langSelect) {
+        langSelect.value = currentLang;
+        langSelect.addEventListener('change', (e) => {
+            switchLanguage(e.target.value, false);
+        });
+    }
+
+    // 初次載入只翻譯靜態結構，不觸發 renderProducts 避免報錯
+    switchLanguage(currentLang, true);
+
     // ==========================================
     // 0. 初始化 Supabase 客戶端
     // ==========================================
@@ -628,7 +742,7 @@ document.addEventListener('DOMContentLoaded', () => {
             currentRenderedItems = items;
 
             if (items.length === 0) {
-                grid.innerHTML = `<div class="col-span-1 sm:col-span-2 md:col-span-4 text-center py-12 text-zera-black/50 text-sm">沒有找到符合當前條件的精品。</div>`;
+                grid.innerHTML = `<div class="col-span-1 sm:col-span-2 md:col-span-4 text-center py-12 text-zera-black/50 text-sm">${i18nDictionary[currentLang]['no_products_found']}</div>`;
                 return;
             }
 
@@ -656,7 +770,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     
                     <div class="mt-auto w-full flex items-center justify-between border-t border-zera-cream pt-4">
                         <div class="text-zera-tan font-semibold text-sm tracking-wide">NT$ ${p.displayPrice}</div>
-                        <button onclick="openProductModal('${p.id}')" class="bg-[#C6A87C] hover:bg-[#B59567] text-white text-[11px] px-4 py-1.5 rounded-full transition-colors font-medium tracking-wider shadow-sm focus:outline-none">立即購買</button>
+                        <button onclick="openProductModal('${p.id}')" class="bg-[#C6A87C] hover:bg-[#B59567] text-white text-[11px] px-4 py-1.5 rounded-full transition-colors font-medium tracking-wider shadow-sm focus:outline-none">${i18nDictionary[currentLang]['btn_buy_now']}</button>
                     </div>
                 </div>
             `}).join('');
