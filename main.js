@@ -290,41 +290,56 @@ document.addEventListener('DOMContentLoaded', () => {
     // 1. 全域視圖路由切換 (SPA Routing) 加上權限攔截
     // ==========================================
     const viewButtons = document.querySelectorAll('[data-view-target]');
-    const viewSections = document.querySelectorAll('.view-section');
+    viewButtons.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const targetId = btn.getAttribute('data-view-target');
+            if (!targetId) return;
 
-    viewButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            let targetId = button.getAttribute('data-view-target');
+            if (targetId === 'grooming-view') {
+                if (!currentUser) {
+                    e.stopPropagation();
 
-            // 【核心邏輯】：攔截未登入用戶
-            // 如果用戶想進入會員中心 (member-view)，但尚未登入 (currentUser = null)
-            // 將目標視圖強制修改為登入/註冊頁面 (auth-view)
+                    const promptModal = document.getElementById('auth-prompt-modal');
+                    const promptContent = document.getElementById('auth-prompt-content');
+                    if (promptModal && promptContent) {
+                        promptModal.classList.remove('hidden');
+                        void promptModal.offsetWidth;
+                        promptModal.classList.remove('opacity-0');
+                        promptContent.classList.remove('scale-95', 'opacity-0');
+                        promptContent.classList.add('scale-100', 'opacity-100');
+                        document.body.style.overflow = 'hidden';
+                    }
+                    return;
+                }
+
+                window.setGroomingStep(1);
+            }
+
+            let viewTargetId = targetId;
             if (targetId === 'member-view' && !currentUser) {
-                targetId = 'auth-view';
+                viewTargetId = 'auth-view';
             } else if (targetId === 'member-view' && currentUser) {
                 showLoader();
                 setTimeout(() => hideLoader(), 600);
             }
 
-            // 隱藏所有視圖
-            viewSections.forEach(section => {
-                section.classList.remove('block');
-                section.classList.add('hidden');
+            document.querySelectorAll('.view-section').forEach(sec => {
+                sec.classList.remove('block');
+                sec.classList.add('hidden');
             });
 
-            // 顯示目標視圖
-            const targetSection = document.getElementById(targetId);
+            const targetSection = document.getElementById(viewTargetId);
             if (targetSection) {
                 targetSection.classList.remove('hidden');
                 targetSection.classList.add('block');
             }
 
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-
             const mobileMenu = document.getElementById('mobile-menu');
             if (mobileMenu && !mobileMenu.classList.contains('hidden')) {
                 mobileMenu.classList.add('hidden');
             }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         });
     });
 
@@ -1568,7 +1583,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // ==========================================
     // 8. 導覽列錨點點擊自動返回首頁邏輯
     // ==========================================
-    const navAnchorLinks = document.querySelectorAll('nav a[href^="#"], #mobile-menu a[href^="#"]');
+    // 僅監聽長度大於 1 的錨點 (例如 #brand-story)，排除 "#"
+    const navAnchorLinks = document.querySelectorAll('nav a[href^="#"]:not([href="#"]), #mobile-menu a[href^="#"]:not([href="#"])');    
     
     navAnchorLinks.forEach(link => {
         link.addEventListener('click', (e) => {
@@ -1807,17 +1823,10 @@ document.addEventListener('DOMContentLoaded', () => {
         bookedSlots: [] // 存放從 Supabase 抓取的所有已被預約的時段
     };
 
-    // 視圖攔截：點擊導覽列「到府寵物美容」時，必須登入
+    // 點擊到府美容時，載入上次預約資料以供一鍵帶入
     document.querySelectorAll('[data-view-target="grooming-view"]').forEach(btn => {
-        btn.addEventListener('click', async (e) => {
-            if (!currentUser) {
-                e.preventDefault();
-                e.stopPropagation();
-                document.getElementById('auth-prompt-modal').classList.remove('hidden');
-                document.getElementById('auth-prompt-content').classList.remove('scale-95', 'opacity-0');
-                document.getElementById('auth-prompt-content').classList.add('scale-100', 'opacity-100');
-                return;
-            }
+        btn.addEventListener('click', async () => {
+            if (!currentUser) return;
             
             // 進入畫面時，檢查是否曾經預約過，若有則顯示「一鍵帶入」按鈕
             const { data } = await supabase
@@ -1841,9 +1850,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
                     alert('已為您帶入上次預約的環境資料。');
                 };
+            } else if (autofillBtn) {
+                autofillBtn.classList.add('hidden');
             }
-            
-            window.setGroomingStep(1);
         });
     });
 

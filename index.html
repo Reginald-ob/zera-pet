@@ -82,7 +82,7 @@
             <a href="#product-display" data-i18n="nav_products" class="hover:text-zera-tan transition">探索系列</a>
             <a href="#bespoke-service" data-i18n="nav_delivery" class="hover:text-zera-tan transition">大型商品預約配送</a>
             <a href="https://line.me/R/ti/p/@117erntk" target="_blank" data-i18n="nav_training" class="hover:text-zera-tan transition">專業訓犬師預約</a>
-            <a href="#" data-view-target="grooming-view" data-i18n="nav_grooming" class="hover:text-zera-tan transition cursor-pointer">到府寵物美容預約</a>
+            <a data-view-target="grooming-view" data-i18n="nav_grooming" class="hover:text-zera-tan transition cursor-pointer">到府寵物美容預約</a>
             <a href="#contact-us" data-i18n="nav_contact" class="hover:text-zera-tan transition">聯絡我們</a>
         </div>
     </nav>
@@ -93,7 +93,8 @@
         <a href="#product-display" data-action="close-mobile-menu" class="block w-full text-left py-2 border-b border-zera-tan/20">探索系列</a>
         <a href="#bespoke-service" data-action="close-mobile-menu" class="block w-full text-left py-2 border-b border-zera-tan/20">預約配送</a>
         <a href="https://line.me/R/ti/p/@117erntk" target="_blank" data-i18n="nav_training" data-action="close-mobile-menu" class="block w-full text-left py-2 border-b border-zera-tan/20">專業訓犬師預約</a>
-        <a href="#" data-view-target="grooming-view" data-action="close-mobile-menu" class="block w-full text-left py-2 border-b border-zera-tan/20">到府寵物美容預約</a>
+        <!-- 將 href="#" 改為 cursor-pointer，避免觸發 hash 錨點跳轉 -->
+        <a data-view-target="grooming-view" data-action="close-mobile-menu" class="block w-full text-left py-2 border-b border-zera-tan/20">到府寵物美容預約</a>
         <button data-view-target="member-view" data-action="close-mobile-menu" class="block w-full text-center py-2 bg-zera-tan rounded-full mt-4">會員中心</button>
     </div>
 
