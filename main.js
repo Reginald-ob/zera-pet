@@ -151,6 +151,8 @@ document.addEventListener('DOMContentLoaded', () => {
             'nav_news': '最新消息',
             'nav_products': '探索系列',
             'nav_delivery': '大型商品預約配送',
+            'nav_training': '專業訓犬師預約',
+            'nav_grooming': '到府寵物美容預約',
             'nav_contact': '聯絡我們',
             'hero_title': '為您的高貴夥伴<br><span class="text-zera-tan">打造極致生活</span>',
             'hero_desc': 'ZERA 融匯杜賓之堅毅與邊牧之靈動，以極致美學，為您的摯愛寫下溫潤生活的篇章。',
@@ -187,6 +189,8 @@ document.addEventListener('DOMContentLoaded', () => {
             'nav_news': 'Latest News',
             'nav_products': 'Collections',
             'nav_delivery': 'Bespoke Delivery',
+            'nav_training': 'Dog Training',
+            'nav_grooming': 'In-Home Grooming',
             'nav_contact': 'Contact Us',
             'hero_title': 'For Your Noble Companion<br><span class="text-zera-tan">The Ultimate Lifestyle</span>',
             'hero_desc': 'ZERA blends the resilience of a Doberman with the agility of a Border Collie, writing a chapter of elegant living for your beloved with ultimate aesthetics.',
@@ -1677,8 +1681,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
-});
-
     // ==========================================
     // 9. 訂單詳情卡片 (Order Details Modal) 邏輯
     // ==========================================
@@ -1791,3 +1793,256 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
+    // ==========================================
+    // 10. 到府寵物美容預約邏輯 (Grooming System)
+    // ==========================================
+    let groomingState = {
+        petCount: 1,
+        envData: {},
+        selectedGroomer: null,
+        selectedTime: null,
+        amount: 0,
+        groomersData: [],
+        bookedSlots: [] // 存放從 Supabase 抓取的所有已被預約的時段
+    };
+
+    // 視圖攔截：點擊導覽列「到府寵物美容」時，必須登入
+    document.querySelectorAll('[data-view-target="grooming-view"]').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+            if (!currentUser) {
+                e.preventDefault();
+                e.stopPropagation();
+                document.getElementById('auth-prompt-modal').classList.remove('hidden');
+                document.getElementById('auth-prompt-content').classList.remove('scale-95', 'opacity-0');
+                document.getElementById('auth-prompt-content').classList.add('scale-100', 'opacity-100');
+                return;
+            }
+            
+            // 進入畫面時，檢查是否曾經預約過，若有則顯示「一鍵帶入」按鈕
+            const { data } = await supabase
+                .from('grooming_reservations')
+                .select('*')
+                .eq('member_id', currentUser.id)
+                .order('created_at', { ascending: false })
+                .limit(1);
+
+            const autofillBtn = document.getElementById('groom-autofill-btn');
+            if (data && data.length > 0 && autofillBtn) {
+                autofillBtn.classList.remove('hidden');
+                autofillBtn.onclick = () => {
+                    document.getElementById('groom-pet-count').value = data[0].pet_count;
+                    document.getElementById('groom-address').value = data[0].env_data.address || '';
+                    
+                    // 勾選對應的環境選項
+                    const opts = data[0].env_data.options || [];
+                    document.querySelectorAll('input[name="env_opts"]').forEach(cb => {
+                        cb.checked = opts.includes(cb.value);
+                    });
+                    alert('已為您帶入上次預約的環境資料。');
+                };
+            }
+            
+            window.setGroomingStep(1);
+        });
+    });
+
+    // 控制三個步驟的切換與 UI 狀態
+    window.setGroomingStep = function(step) {
+        document.getElementById('groom-step-1').classList.add('hidden');
+        document.getElementById('groom-step-2').classList.add('hidden');
+        document.getElementById('groom-step-3').classList.add('hidden');
+        document.getElementById(`groom-step-${step}`).classList.remove('hidden');
+
+        // 更新進度條樣式
+        for (let i = 1; i <= 3; i++) {
+            const indicator = document.getElementById(`groom-step-${i}-indicator`);
+            const circle = indicator.querySelector('div');
+            if (i === step) {
+                indicator.classList.remove('opacity-40');
+                circle.className = 'w-8 h-8 mx-auto bg-zera-tan text-white rounded-full flex items-center justify-center font-serif text-sm transition-colors shadow-md';
+            } else if (i < step) {
+                indicator.classList.remove('opacity-40');
+                circle.className = 'w-8 h-8 mx-auto bg-zera-charcoal text-white rounded-full flex items-center justify-center font-serif text-sm transition-colors';
+            } else {
+                indicator.classList.add('opacity-40');
+                circle.className = 'w-8 h-8 mx-auto bg-zera-cream text-zera-black rounded-full flex items-center justify-center font-serif text-sm transition-colors border border-zera-tan/30';
+            }
+        }
+    };
+
+    // Step 1: 提交表單，前往 Step 2
+    const groomEnvForm = document.getElementById('groom-env-form');
+    if (groomEnvForm) {
+        groomEnvForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            // 收集資料
+            groomingState.petCount = document.getElementById('groom-pet-count').value;
+            const address = document.getElementById('groom-address').value;
+            const opts = Array.from(document.querySelectorAll('input[name="env_opts"]:checked')).map(cb => cb.value);
+            
+            groomingState.envData = { address: address, options: opts };
+            
+            // 進入 Step 2 前，先發動 API 取得美容師資料庫與 Supabase 的鎖定時段
+            if (typeof showLoader === 'function') showLoader();
+            await fetchGroomersDataAndRender();
+            if (typeof hideLoader === 'function') hideLoader();
+            
+            window.setGroomingStep(2);
+        });
+    }
+
+    // 取得資料並渲染美容師卡片
+    async function fetchGroomersDataAndRender() {
+        try {
+            // 1. 取得 Supabase 已被其他顧客預約的時段 (用於灰底防重複預約)
+            const { data: bookedData } = await supabase.from('grooming_reservations').select('groomer_id, reserved_time').neq('status', '已取消');
+            groomingState.bookedSlots = bookedData || [];
+
+            // 2. 模擬從 Google Sheets 第2張工作表取得美容師資料
+            // 實作時，請將此處改為您專門撈取 Groomer API 的 endpoint
+            /* const response = await fetch('YOUR_GROOMER_API_URL');
+               const groomers = await response.json(); */
+            
+            // 這裡給出一組高質感的假資料範例
+            const groomers = [
+                { id: 'GR-01', name: 'Mika 林', title: '首席星級匠人', desc: '擁有 8 年頂級寵物沙龍經驗，專精於長毛犬種修剪與貓咪零壓力誘導洗浴。', price: 2500, slots: '11/6 21:00,11/7 16:30,11/8 14:00' },
+                { id: 'GR-02', name: 'Sato 佐藤', title: '日系造型總監', desc: '赴日進修獲雙料認證，擅長日系立體造型，極度注重寵物膚質調理。', price: 2800, slots: '11/6 21:00,11/7 10:00,11/9 13:00' }
+            ];
+            
+            groomingState.groomersData = groomers;
+            renderGroomers();
+
+        } catch (err) {
+            console.error('無法讀取美容師資料', err);
+        }
+    }
+
+    function renderGroomers() {
+        const container = document.getElementById('groomers-container');
+        if (!container) return;
+
+        container.innerHTML = groomingState.groomersData.map((g, idx) => {
+            // 處理時段字串，並比對 Supabase 判斷是否已被預約
+            const slotArray = g.slots.split(',').map(s => s.trim());
+            const slotBtns = slotArray.map(slot => {
+                // 檢查此美容師的這個時段是否已存在於 Supabase 訂單中
+                const isBooked = groomingState.bookedSlots.some(b => b.groomer_id === g.id && b.reserved_time === slot);
+                
+                if (isBooked) {
+                    return `<button type="button" disabled class="px-2 py-1 text-[10px] rounded border border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed line-through">${slot} (已約滿)</button>`;
+                } else {
+                    return `<button type="button" onclick="selectGroomerSlot('${g.id}', '${slot}', ${g.price})" class="groom-slot-btn px-2 py-1 text-[10px] rounded border border-zera-tan/40 text-zera-black/70 hover:bg-zera-tan hover:text-white transition-colors tracking-wider">${slot}</button>`;
+                }
+            }).join('');
+
+            return `
+                <div class="bg-zera-cream/10 border border-zera-tan/20 rounded-2xl p-5 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <h4 class="font-bold text-zera-black text-sm">${g.name}</h4>
+                            <span class="bg-zera-charcoal text-white text-[9px] px-2 py-0.5 rounded-full tracking-widest">${g.title}</span>
+                        </div>
+                        <p class="text-xs text-zera-black/60 leading-relaxed mb-4">${g.desc}</p>
+                    </div>
+                    <div class="border-t border-zera-tan/10 pt-3">
+                        <p class="text-xs font-bold text-zera-tan mb-2 tracking-widest">單隻服務費: NT$ ${g.price.toLocaleString()}</p>
+                        <p class="text-[10px] text-zera-black/50 mb-1">可預約時段 (實時更新)：</p>
+                        <div class="flex flex-wrap gap-2">
+                            ${slotBtns}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    // 選取美容師與時段的互動邏輯
+    window.selectGroomerSlot = function(groomerId, slot, price) {
+        // 重置所有按鈕樣式
+        document.querySelectorAll('.groom-slot-btn').forEach(btn => {
+            btn.classList.remove('bg-zera-tan', 'text-white');
+            btn.classList.add('text-zera-black/70');
+        });
+        
+        // 將當前點擊的按鈕設為 active
+        const activeBtn = event.target;
+        activeBtn.classList.remove('text-zera-black/70');
+        activeBtn.classList.add('bg-zera-tan', 'text-white');
+
+        const groomer = groomingState.groomersData.find(g => g.id === groomerId);
+        groomingState.selectedGroomer = groomer;
+        groomingState.selectedTime = slot;
+        groomingState.amount = price * groomingState.petCount; // 金額 = 單價 x 寵物數量
+
+        const toCheckoutBtn = document.getElementById('groom-to-checkout-btn');
+        toCheckoutBtn.disabled = false;
+        toCheckoutBtn.textContent = `預約 ${groomer.name} 於 ${slot}，前往結帳`;
+    };
+
+    // Step 2 前往 Step 3 (帶入結帳摘要)
+    const toCheckoutBtn = document.getElementById('groom-to-checkout-btn');
+    if (toCheckoutBtn) {
+        toCheckoutBtn.addEventListener('click', () => {
+            document.getElementById('summary-groomer').textContent = groomingState.selectedGroomer.name;
+            document.getElementById('summary-time').textContent = groomingState.selectedTime;
+            document.getElementById('summary-pets').textContent = `${groomingState.petCount} 隻`;
+            document.getElementById('summary-amount').textContent = `NT$ ${groomingState.amount.toLocaleString()}`;
+            
+            window.setGroomingStep(3);
+        });
+    }
+
+    // Step 3 結帳寫入 Supabase
+    const groomSubmitBtn = document.getElementById('groom-submit-btn');
+    if (groomSubmitBtn) {
+        groomSubmitBtn.addEventListener('click', async () => {
+            const last5 = document.getElementById('groom-bank-last-5').value.trim();
+            if (!last5 || last5.length !== 5 || isNaN(last5)) {
+                alert('請輸入正確的匯款帳號末 5 碼（需為 5 位數字）');
+                return;
+            }
+
+            groomSubmitBtn.disabled = true;
+            groomSubmitBtn.textContent = '預約資料寫入中...';
+            if (typeof showLoader === 'function') showLoader();
+
+            try {
+                // 寫入 grooming_reservations
+                const insertData = {
+                    member_id: currentUser.id,
+                    pet_count: groomingState.petCount,
+                    env_data: groomingState.envData,
+                    groomer_id: groomingState.selectedGroomer.id,
+                    groomer_name: groomingState.selectedGroomer.name,
+                    reserved_time: groomingState.selectedTime,
+                    amount: groomingState.amount,
+                    payment_last5: last5,
+                    status: '處理中'
+                };
+
+                const { error } = await supabase.from('grooming_reservations').insert([insertData]);
+                if (error) throw error;
+
+                alert(`已成功為您預約 ${groomingState.selectedGroomer.name} 匠人的專屬到府服務，並確認收到您的付款資訊！\n我們將在 24 小時內與您聯繫確認細節。`);
+                
+                // 重置並返回首頁
+                document.getElementById('groom-env-form').reset();
+                document.getElementById('groom-bank-last-5').value = '';
+                groomingState = { petCount: 1, envData: {}, selectedGroomer: null, selectedTime: null, amount: 0, groomersData: [], bookedSlots: [] };
+                toCheckoutBtn.disabled = true;
+                toCheckoutBtn.textContent = '確認時段，前往結帳 Checkout';
+                
+                document.querySelector('[data-view-target="home-view"]').click();
+                
+            } catch (err) {
+                alert('預約失敗：' + err.message);
+            } finally {
+                if (typeof hideLoader === 'function') hideLoader();
+                groomSubmitBtn.disabled = false;
+                groomSubmitBtn.textContent = '確認送出預約 Submit';
+            }
+        });
+    }
+});
